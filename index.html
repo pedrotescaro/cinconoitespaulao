@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Five Nights at Paulão - Final with Menu Style Arrows</title>
+<title>Five Nights at Paulão - Complete Edition</title>
 <style>
     /* --- CSS GERAL --- */
     body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', Courier, monospace; user-select: none; color: white; }
@@ -13,7 +13,7 @@
     @keyframes static-loop {
         0% { background-image: url('staticpngs/1.png'); } 12.5% { background-image: url('staticpngs/2.png'); } 25% { background-image: url('staticpngs/3.png'); } 37.5% { background-image: url('staticpngs/4.png'); } 50% { background-image: url('staticpngs/5.png'); } 62.5% { background-image: url('staticpngs/6.png'); } 75% { background-image: url('staticpngs/7.png'); } 87.5% { background-image: url('staticpngs/8.png'); } 100% { background-image: url('staticpngs/1.png'); }
     }
-    #menu-paulao { position: absolute; right: 0; bottom: 0; height: 100vh; width: auto; max-width: 60vw; object-fit: cover; z-index: 1001; filter: brightness(0.5) contrast(1.3) sepia(0.3); pointer-events: none; }
+    #menu-paulao { position: absolute; right: 0; bottom: 0; height: 100vh; width: auto; max-width: 60vw; object-fit: cover; z-index: 1001; filter: brightness(0.5) contrast(1.3) sepia(0.3); pointer-events: none; transition: opacity 0.3s; }
     #menu-content { position: absolute; top: 15%; left: 10%; z-index: 1002; display: flex; flex-direction: column; }
     #game-title { font-size: 4rem; font-weight: bold; text-shadow: 4px 4px 0px #500; margin-bottom: 40px; border-left: 5px solid #500; padding-left: 20px; animation: glitch-text 0.3s infinite; }
     .menu-option { font-size: 1.8rem; margin: 10px 0; cursor: pointer; width: fit-content; transition: 0.1s; font-weight: bold; color: #ccc; }
@@ -21,6 +21,7 @@
     .menu-option::before { content: ">> "; opacity: 0; }
     .menu-option:hover::before { opacity: 1; }
     .scanlines-menu { position: absolute; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 1px, transparent 2px, transparent 4px); pointer-events: none; z-index: 2001; }
+    #menu-option-continue { display: none; }
 
     /* --- JOGO (AMBIENTE 3D) --- */
     #game-view { 
@@ -54,7 +55,6 @@
         opacity: 0.8; 
     }
 
-       /* Posições Iniciais (Meio escondidos) */
     .panel-left { 
         left: -10px; 
         border-left: none; 
@@ -68,7 +68,6 @@
         transform-origin: right center;
     }
     
-     /* ATIVAÇÃO 3D */
     .panel-left.active-view {
         transform: rotateY(10deg) translateX(10px); 
         opacity: 1;
@@ -127,17 +126,16 @@
     /* CCTV E SETAS */
     #cctv-layer { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 50; border: 5px solid #333; }
     #cctv-feed { width: 100%; height: 100%; background-color: #111; background-size: cover; background-position: center; position: relative; }
-    #paulao-cam-overlay { display: none; position: absolute; top: 20%; left: 30%; height: 60%; filter: grayscale(0.8) contrast(1.2); }
+    #paulao-cam-overlay { display: none; position: absolute; top: 20%; left: 30%; height: 60%; filter: grayscale(0.8) contrast(1.2); transition: all 0.3s; }
     .scanlines { position: absolute; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 1px, transparent 2px, transparent 4px); pointer-events: none; z-index: 55; }
     #white-bars-anim { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.15; z-index: 52; pointer-events: none; mix-blend-mode: screen; display: none; object-fit: cover; }
 
-    /* --- ESTILO DAS SETAS (ATUALIZADO) --- */
     .cam-arrow {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 5rem; /* Tamanho grande */
-        font-family: 'Courier New', Courier, monospace; /* Mesma fonte do menu */
+        font-size: 5rem;
+        font-family: 'Courier New', Courier, monospace;
         font-weight: bold;
         color: rgba(255, 255, 255, 0.7);
         cursor: pointer;
@@ -147,26 +145,71 @@
         transition: 0.1s;
         text-shadow: 2px 2px 0 #000;
     }
-    /* Efeito de Hover igual ao menu (Verde e Brilhante) */
     .cam-arrow:hover { 
         color: #0f0;
         text-shadow: 0 0 15px #0f0;
-        transform: translateY(-50%) scale(1.1); /* Leve aumento */
+        transform: translateY(-50%) scale(1.1);
     }
     #arrow-left { left: 20px; }
     #arrow-right { right: 20px; }
 
-    #map-ui { position: absolute; bottom: 60px; right: 50px; width: 250px; height: 180px; background-image: url('map.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 60; }
-    .cam-btn { width: 45px; height: 25px; background: #222; color: #fff; border: 1px solid #555; position: absolute; cursor: pointer; font-size: 10px; opacity: 0.7; }
+    #map-ui { 
+        position: absolute; 
+        bottom: 60px; 
+        right: 50px; 
+        width: 400px; 
+        height: 280px; 
+        background-image: url('map.png'); 
+        background-size: contain; 
+        background-repeat: no-repeat; 
+        background-position: center; 
+        z-index: 60; 
+    }
+    .cam-btn { 
+        width: 32px; 
+        height: 18px; 
+        background: transparent; 
+        border: none; 
+        position: absolute; 
+        cursor: pointer; 
+        padding: 0; 
+        opacity: 0.85; 
+        transition: opacity 0.2s;
+    }
+    .cam-btn img { 
+        width: 100%; 
+        height: 100%; 
+        display: block; 
+        pointer-events: none;
+        object-fit: contain;
+    }
     .cam-btn:hover { opacity: 1; }
-    .cam-btn.active { background: #0f0; color: black; animation: blink-btn 1s infinite; }
+    .cam-btn.active { opacity: 1; }
+    .cam-btn:active img { 
+        filter: brightness(0.8); 
+    }
     
-    #btn-1a { top: 10px; left: 90px; } #btn-1b { top: 50px; left: 50px; } #btn-2a { top: 90px; left: 90px; } #btn-3 { top: 50px; right: 40px; } #btn-4 { bottom: 20px; right: 80px; }
+    /* Posições das câmeras baseadas no layout do FNAF original - Ajustadas para mapa maior */
+    #btn-1a { top: 12px; left: 50%; transform: translateX(-50%); } /* CAM 1A - Topo centro */
+    #btn-1b { top: 45px; left: 28%; } /* CAM 1B - Esquerda e abaixo de 1A */
+    #btn-1c { bottom: 70px; left: 32%; } /* CAM 1C - Ponto vermelho, no caminho perto de 6 */
+    #btn-2a { top: 60px; left: 38%; } /* CAM 2A - Pirate Cove, abaixo de 1B */
+    #btn-3 { top: 45px; right: 28%; } /* CAM 3 - Direita de 1A */
+    #btn-4 { bottom: 28px; right: 36%; } /* CAM 4 - Abaixo de 5, à direita */
+    #btn-5 { bottom: 65px; left: 50%; transform: translateX(-50%); } /* CAM 5 - Centro */
+    #btn-6 { bottom: 65px; left: 20%; } /* CAM 6 - Esquerda do cluster central */
+    #btn-7 { bottom: 52px; right: 28%; } /* CAM 7 - Abaixo de 3 */
 
     #paulao-sprite { position: absolute; display: none; width: 300px; bottom: 0; z-index: 4; filter: brightness(0.2); transition: filter 0.1s; }
     .paulao-door-l { left: 12%; display: block !important; } .paulao-door-r { right: 12%; display: block !important; }
 
     #monitor-transition { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 200; object-fit: cover; pointer-events: none; }
+
+    /* PHONE CALL */
+    #phone-call-layer { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 150; }
+    #phone-call-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; max-width: 80%; font-size: 1.2rem; line-height: 1.8; }
+    #phone-call-skip { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 1rem; color: #888; cursor: pointer; }
+    #phone-call-skip:hover { color: #fff; }
 
     /* JUMPSCARE & GAME OVER */
     #paulao-attack { display: none; position: absolute; left: 0; bottom: 0; height: auto; max-width: 80vw; max-height: 100vh; background: transparent !important; border: none !important; box-shadow: none !important; z-index: 200; animation: foxy-shake 0.15s infinite; filter: contrast(1.5) brightness(0.8); pointer-events: none; }
@@ -177,11 +220,15 @@
 
     #static-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); background-size: cover; z-index: 300; opacity: 0.8; }
     #game-over-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; font-size: 3rem; font-weight: bold; display: none; z-index: 301; }
+    #win-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 400; text-align: center; }
+    #win-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; }
 
     /* HUD E USAGE BAR */
     #hud { position: absolute; bottom: 20px; left: 20px; color: white; font-size: 1.2rem; z-index: 20; text-shadow: 1px 1px 0 #000; }
     #usage-container { margin-top: 5px; }
     #usage-img { height: 25px; display: block; }
+    #time-display { position: fixed; top: 20px; right: 20px; font-size: 2rem; z-index: 20; text-shadow: 2px 2px 0 #000; }
+    #night-display { font-size: 1rem; color: #aaa; }
 </style>
 </head>
 <body>
@@ -191,10 +238,10 @@
     <div class="scanlines-menu"></div>
     <div id="menu-content">
         <div id="game-title">Five Nights<br>at Paulão</div>
-        <div class="menu-option" onclick="startGame()">New Game</div>
-        <div class="menu-option" onclick="playSound('blip')">Continue</div>
-        <div class="menu-option" onclick="playSound('blip')">6th Night</div>
-        <div class="menu-option" onclick="playSound('blip')">Custom Night</div>
+        <div class="menu-option" onclick="startGame(1)">New Game</div>
+        <div class="menu-option" id="menu-option-continue" onclick="continueGame()">Continue</div>
+        <div class="menu-option" onclick="startGame(6)">6th Night</div>
+        <div class="menu-option" onclick="startCustomNight()">Custom Night</div>
         <div style="margin-top: 30px; font-size: 0.8rem; color: #555;">(C) 2025 Predo Games</div>
     </div>
     <img id="menu-paulao" src="paulo_menu1.png">
@@ -204,6 +251,19 @@
 <img id="paulao-attack" src="paulao_susto.png">
 <div id="static-screen"></div>
 <div id="game-over-txt">GAME OVER</div>
+<div id="win-screen">
+    <div id="win-content">
+        <h1>6 AM</h1>
+        <p>Você sobreviveu!</p>
+        <p style="font-size: 1rem; margin-top: 30px;">Parabéns por sobreviver a mais uma noite!</p>
+        <button onclick="location.reload()" style="margin-top: 30px; padding: 10px 30px; font-size: 1rem; cursor: pointer; background: #333; color: white; border: 2px solid #555;">Voltar ao Menu</button>
+    </div>
+</div>
+
+<div id="phone-call-layer">
+    <div id="phone-call-content"></div>
+    <div id="phone-call-skip" onclick="skipPhoneCall()">[Pressione qualquer tecla para pular]</div>
+</div>
 
 <div id="game-view">
     <div class="vignette"></div> 
@@ -233,7 +293,11 @@
             Usage: <br>
             <img id="usage-img" src="USAGE_BAR/1.png" alt="Usage Level">
         </div>
-        <div style="position: fixed; top: 20px; right: 20px; font-size: 2rem;">12 AM <br> <span style="font-size:1rem">Night 1</span></div>
+    </div>
+
+    <div id="time-display">
+        <div id="time-text">12 AM</div>
+        <div id="night-display">Night <span id="night-num">1</span></div>
     </div>
 
     <div id="monitor-trigger" onclick="toggleMonitor()">
@@ -246,400 +310,878 @@
         <div id="cctv-feed">
             <img id="paulao-cam-overlay" src="paulao.png">
         </div> 
-        <div style="position: absolute; top: 30px; left: 30px; color: white; font-size: 1.5rem; animation: blink 1s infinite;">● REC</div>
+        <div style="position: absolute; top: 30px; left: 30px; animation: blink 1s infinite;">
+            <img src="0-REC.png" alt="REC" style="height: 30px; width: auto;">
+        </div>
         <div style="position: absolute; top: 30px; right: 30px; color: white; font-size: 1.5rem;" id="cam-name">CAM 1A</div>
         
         <div id="arrow-left" class="cam-arrow" onclick="cycleCam(-1)">&lt;&lt;</div>
         <div id="arrow-right" class="cam-arrow" onclick="cycleCam(1)">&gt;&gt;</div>
 
         <div id="map-ui">
-            <button id="btn-1a" class="cam-btn active" onclick="switchCam('1A')">CAM 1A</button>
-            <button id="btn-1b" class="cam-btn" onclick="switchCam('1B')">CAM 1B</button>
-            <button id="btn-2a" class="cam-btn" onclick="switchCam('2A')">CAM 2A</button>
-            <button id="btn-3"  class="cam-btn" onclick="switchCam('3')">CAM 3</button>
-            <button id="btn-4"  class="cam-btn" onclick="switchCam('4')">CAM 4</button>
+            <button id="btn-1a" class="cam-btn active" onclick="switchCam('1A')"><img src="CAM_BUTTONS/1-CAM 1A.png" alt="CAM 1A"></button>
+            <button id="btn-1b" class="cam-btn" onclick="switchCam('1B')"><img src="CAM_BUTTONS/1-CAM 1B.png" alt="CAM 1B"></button>
+            <button id="btn-1c" class="cam-btn" onclick="switchCam('1C')"><img src="CAM_BUTTONS/1-CAM 1C.png" alt="CAM 1C"></button>
+            <button id="btn-2a" class="cam-btn" onclick="switchCam('2A')"><img src="CAM_BUTTONS/2-CAM 2A.png" alt="CAM 2A"></button>
+            <button id="btn-3"  class="cam-btn" onclick="switchCam('3')"><img src="CAM_BUTTONS/3-CAM 3.png" alt="CAM 3"></button>
+            <button id="btn-4"  class="cam-btn" onclick="switchCam('4')"><img src="CAM_BUTTONS/4-CAM 4A.png" alt="CAM 4"></button>
+            <button id="btn-5"  class="cam-btn" onclick="switchCam('5')"><img src="CAM_BUTTONS/5-CAM 5.png" alt="CAM 5"></button>
+            <button id="btn-6"  class="cam-btn" onclick="switchCam('6')"><img src="CAM_BUTTONS/6-CAM 6.png" alt="CAM 6"></button>
+            <button id="btn-7"  class="cam-btn" onclick="switchCam('7')"><img src="CAM_BUTTONS/7-CAM 7.png" alt="CAM 7"></button>
         </div>
     </div>
 </div>
 
 <script>
-    const audioFiles = {
-        menu_static: 'audio/static2.wav',
-        blip: 'audio/blip3.wav',
-        fan: 'audio/Buzz_Fan_Florescent2.wav',
-        ambience: 'audio/ambience2.wav',
-        door: 'audio/OVEN-DRA_1_GEN-HDF18119.wav',
-        light_hum: 'audio/BallastHumMedium2.wav',
-        monitor_open: 'audio/CAMERA_VIDEO_LOA_60105303.wav',
-        monitor_close: 'audio/put down.wav',
-        run: 'audio/running fast3.wav',
-        bang: 'audio/DOOR_POUNDING_ME_D0291401.wav',
-        step: 'audio/deep steps.wav',
-        powerdown: 'audio/powerdown.wav',
-        darkness: 'audio/darkness music.wav',
-        scream: 'audio/XSCREAM.wav',
-        win: 'audio/chimes 2.wav'
-    };
+// ========== CONFIGURAÇÕES E CONSTANTES ==========
+const SECONDS_PER_HOUR = 89; // 89 segundos por hora (como no FNAF original)
+const TOTAL_GAME_TIME = SECONDS_PER_HOUR * 6; // 6 horas (12 AM - 6 AM)
 
-    const loops = {
-        menu: new Audio(audioFiles.menu_static),
-        fan: new Audio(audioFiles.fan),
-        ambience: new Audio(audioFiles.ambience),
-        light: new Audio(audioFiles.light_hum)
-    };
+const audioFiles = {
+    menu_static: 'audio/static2.wav',
+    blip: 'audio/blip3.wav',
+    fan: 'audio/Buzz_Fan_Florescent2.wav',
+    ambience: 'audio/ambience2.wav',
+    door: 'audio/OVEN-DRA_1_GEN-HDF18119.wav',
+    light_hum: 'audio/BallastHumMedium2.wav',
+    monitor_open: 'audio/CAMERA_VIDEO_LOA_60105303.wav',
+    monitor_close: 'audio/put down.wav',
+    run: 'audio/running fast3.wav',
+    bang: 'audio/DOOR_POUNDING_ME_D0291401.wav',
+    step: 'audio/deep steps.wav',
+    powerdown: 'audio/powerdown.wav',
+    darkness: 'audio/darkness music.wav',
+    scream: 'audio/XSCREAM.wav',
+    win: 'audio/chimes 2.wav',
+    phone1: 'audio/voiceover1c.wav',
+    phone2: 'audio/voiceover2a.wav',
+    phone3: 'audio/voiceover3.wav',
+    phone4: 'audio/voiceover4.wav',
+    phone5: 'audio/voiceover5.wav',
+    garble: 'audio/garble1.wav'
+};
 
-    loops.menu.loop = true;
-    loops.fan.loop = true;
-    loops.ambience.loop = true;
-    loops.light.loop = true;
-    loops.menu.volume = 0.3; 
+const camImages = {
+    '1A': 'cam1.jpg',
+    '1B': 'cam2.jpg',
+    '1C': 'cam1.jpg',  // CAM 1C adicionada
+    '2A': 'cam2.jpg',
+    '3':  'cam3.png',
+    '4':  'cam4.jpg',
+    '5':  'cam5.jpg',
+    '6':  'cam1.jpg',
+    '7':  'cam2.jpg'
+};
 
-    function playSound(key) {
-        if(audioFiles[key]) {
-            const sfx = new Audio(audioFiles[key]);
-            sfx.volume = 0.8;
-            sfx.play().catch(e => {}); 
-        }
+// Sistema de dificuldade por noite (AI Levels) - Baseado no FNAF original
+const NIGHT_DIFFICULTY = {
+    1: { moveChance: 0.008, moveInterval: 5000, aggressive: 0.4, powerDrain: 0.8 },  // Noite 1: Muito fácil
+    2: { moveChance: 0.015, moveInterval: 4500, aggressive: 0.6, powerDrain: 0.9 },  // Noite 2: Fácil
+    3: { moveChance: 0.025, moveInterval: 3800, aggressive: 0.8, powerDrain: 1.0 },  // Noite 3: Médio
+    4: { moveChance: 0.035, moveInterval: 3200, aggressive: 1.0, powerDrain: 1.1 },  // Noite 4: Difícil
+    5: { moveChance: 0.045, moveInterval: 2800, aggressive: 1.2, powerDrain: 1.2 },  // Noite 5: Muito difícil
+    6: { moveChance: 0.055, moveInterval: 2400, aggressive: 1.4, powerDrain: 1.3 }   // Noite 6: Extremo
+};
+
+// Rotas de movimento para Paulo (simulando os 4 animatronics)
+const PAULO_ROUTES = {
+    // Rota 1 (Bonnie-like): Esquerda
+    route1: ['1A', '1B', '2A', '3', '4', 'DoorL', 'Office'],
+    // Rota 2 (Chica-like): Direita  
+    route2: ['1A', '1B', '5', '6', '1C', '7', 'DoorR', 'Office'],
+    // Rota 3 (Freddy-like): Direita + Backstage
+    route3: ['1A', '1B', '5', '4', '3', '7', 'DoorR', 'Office'],
+    // Rota 4 (Foxy-like): Pirate Cove direto
+    route4: ['1A', '1B', '2A', 'DoorL', 'Office']
+};
+
+// ========== ESTADO DO JOGO ==========
+const state = {
+    power: 100,
+    doorL: false, doorR: false,
+    lightL: false, lightR: false,
+    cameraActive: false,
+    currentCam: '1A',
+    pauloLocations: {
+        route1: '1A',  // Paulo na rota 1
+        route2: '1A',  // Paulo na rota 2
+        route3: '1A',  // Paulo na rota 3
+        route4: '1A'   // Paulo na rota 4 (Foxy)
+    },
+    pauloProgress: {
+        route1: 0,
+        route2: 0,
+        route3: 0,
+        route4: 0
+    },
+    gameOver: false,
+    currentNight: 1,
+    gameTime: 0,  // Em segundos
+    phoneCallPlayed: false,
+    phoneCallPlaying: false,
+    gameStarted: false,
+    foxyChecks: 0,
+    lastFoxyCheck: 0
+};
+
+// ========== ÁUDIO ==========
+const loops = {
+    menu: new Audio(audioFiles.menu_static),
+    fan: new Audio(audioFiles.fan),
+    ambience: new Audio(audioFiles.ambience),
+    light: new Audio(audioFiles.light_hum)
+};
+
+loops.menu.loop = true;
+loops.fan.loop = true;
+loops.ambience.loop = true;
+loops.light.loop = true;
+loops.menu.volume = 0.3;
+loops.fan.volume = 0.4;
+loops.ambience.volume = 0.3;
+loops.light.volume = 0.5;
+
+function playSound(key, volume = 0.8) {
+    if(audioFiles[key]) {
+        const sfx = new Audio(audioFiles[key]);
+        sfx.volume = volume;
+        sfx.play().catch(e => {}); 
+        return sfx;
     }
+    return null;
+}
 
-    const state = {
-        power: 100,
-        doorL: false, doorR: false,
-        lightL: false, lightR: false,
-        cameraActive: false,
-        currentCam: '1A',
-        paulaoLocation: '1A', 
-        gameOver: false
-    };
+// ========== TIMERS ==========
+let aiTimer = null;
+let powerTimer = null;
+let menuGlitchTimer = null; 
+let isTransitioning = false;
+let whiteBarsInterval = null;
+let gameTimer = null;
+let phoneCallAudio = null;
 
-    const camImages = {
-        '1A': 'cam1.jpg',
-        '1B': 'cam2.jpg',
-        '2A': 'cam2.jpg',
-        '3':  'cam3.png',
-        '4':  'cam4.jpg'
-    };
+// ========== INICIALIZAÇÃO ==========
+document.addEventListener('click', () => {
+    if(document.getElementById('main-menu').style.display !== 'none') {
+        loops.menu.play().catch(()=>{});
+    }
+}, {once:true});
 
-    let aiTimer = null;
-    let powerTimer = null;
-    let menuGlitchTimer = null; 
-    let isTransitioning = false;
-    let whiteBarsInterval = null; 
+checkSavedGame();
 
-    document.addEventListener('click', () => {
-        if(document.getElementById('main-menu').style.display !== 'none') {
-            loops.menu.play().catch(()=>{});
+// ========== MENU E NAVEGAÇÃO ==========
+function menuGlitchLoop() {
+    if(document.getElementById('game-view').style.display === 'block') return; 
+    let timeToNext = Math.random() * 30000 + 1000;
+    menuGlitchTimer = setTimeout(() => {
+        const img = document.getElementById('menu-paulao');
+        const glitchVariants = ['paulo_menu2.png', 'paulo_menu3.png'];
+        const randomGlitch = glitchVariants[Math.floor(Math.random() * glitchVariants.length)];
+        img.src = randomGlitch; 
+        setTimeout(() => {
+            img.src = 'paulo_menu1.png'; 
+            menuGlitchLoop();
+        }, Math.random() * 170 + 50);
+    }, timeToNext);
+}
+menuGlitchLoop();
+
+function checkSavedGame() {
+    const saved = localStorage.getItem('fnaf_paulao_save');
+    if(saved) {
+        try {
+            const saveData = JSON.parse(saved);
+            if(saveData.night && saveData.night < 6) {
+                document.getElementById('menu-option-continue').style.display = 'block';
+            }
+        } catch(e) {}
+    }
+}
+
+function continueGame() {
+    const saved = localStorage.getItem('fnaf_paulao_save');
+    if(saved) {
+        try {
+            const saveData = JSON.parse(saved);
+            startGame(saveData.night || 1);
+        } catch(e) {
+            startGame(1);
         }
-    }, {once:true});
+    } else {
+        startGame(1);
+    }
+}
 
-    // --- LÓGICA DE MOVIMENTO PANORÂMICO E GATILHOS 3D ---
-    const officeLayer = document.getElementById('office-layer');
+function startGame(night) {
+    playSound('blip');
+    loops.menu.pause(); 
+    document.getElementById('main-menu').style.display = 'none';
+    clearTimeout(menuGlitchTimer);
+    document.getElementById('game-view').style.display = 'block';
     
-    document.addEventListener('mousemove', (e) => {
-        if(document.getElementById('game-view').style.display !== 'block') return;
-        if(state.cameraActive || state.gameOver) return;
-        
-        let width = window.innerWidth;
-        let mouseX = e.clientX;
-        let percent = mouseX / width;
-        let moveX = percent * 10; 
-        
-        // Move o fundo
-        officeLayer.style.transform = `translateX(-${moveX}%)`;
-
-        // LÓGICA DOS "3 RETÂNGULOS VIRTUAIS"
-        if (percent < 0.15) {
-            document.getElementById('panel-l').classList.add('active-view');
-        } else {
-            document.getElementById('panel-l').classList.remove('active-view');
-        }
-
-        if (percent > 0.85) {
-            document.getElementById('panel-r').classList.add('active-view');
-        } else {
-            document.getElementById('panel-r').classList.remove('active-view');
-        }
-    });
-
-    function menuGlitchLoop() {
-        if(document.getElementById('game-view').style.display === 'block') return; 
-        let timeToNext = Math.random() * 30000 + 1000;
-        menuGlitchTimer = setTimeout(() => {
-            const img = document.getElementById('menu-paulao');
-            img.src = 'paulo_menu2.png'; 
-            setTimeout(() => {
-                img.src = 'paulo_menu1.png'; 
-                menuGlitchLoop();
-            }, Math.random() * 170 + 50);
-        }, timeToNext);
-    }
-    menuGlitchLoop();
-
-    function startGame() {
-        playSound('blip');
-        loops.menu.pause(); 
-        document.getElementById('main-menu').style.display = 'none';
-        clearTimeout(menuGlitchTimer);
-        document.getElementById('game-view').style.display = 'block';
-        loops.fan.play();
-        loops.ambience.play();
-        startLoops();
-    }
-
-    function startLoops() {
-        powerTimer = setInterval(() => {
-            if(state.gameOver) return;
-            let drain = updateUsage() * 0.2; 
-            state.power -= drain;
-            if(state.power < 0) state.power = 0;
-            document.getElementById('power-val').innerText = Math.floor(state.power);
-            if(state.power <= 0) blackout();
+    // Resetar estado
+    state.currentNight = night;
+    state.gameTime = 0;
+    state.power = 100;
+    state.doorL = false;
+    state.doorR = false;
+    state.lightL = false;
+    state.lightR = false;
+    state.cameraActive = false;
+    state.gameOver = false;
+    state.phoneCallPlayed = false;
+    state.phoneCallPlaying = false;
+    state.gameStarted = false;
+    state.foxyChecks = 0;
+    state.lastFoxyCheck = 0;
+    state.currentCam = '1A';
+    state.pauloLocations = {
+        route1: '1A',
+        route2: '1A',
+        route3: '1A',
+        route4: '1A'
+    };
+    state.pauloProgress = {
+        route1: 0,
+        route2: 0,
+        route3: 0,
+        route4: 0
+    };
+    
+    // Resetar UI
+    document.getElementById('power-val').innerText = 100;
+    document.getElementById('night-num').innerText = night;
+    document.getElementById('time-text').innerText = '12 AM';
+    document.getElementById('door-l').classList.remove('closed');
+    document.getElementById('door-r').classList.remove('closed');
+    document.getElementById('paulao-sprite').style.display = 'none';
+    document.getElementById('paulao-sprite').className = '';
+    updateUsage();
+    
+    // Iniciar loops
+    loops.fan.play();
+    loops.ambience.play();
+    
+    // Tocar phone call após 2 segundos (apenas na primeira noite)
+    if(night === 1) {
+        setTimeout(() => {
+            playPhoneCall(1);
+        }, 2000);
+    } else {
+        setTimeout(() => {
+            state.gameStarted = true;
+            startGameLoops();
         }, 1000);
-
-        aiTimer = setInterval(() => {
-            if(state.gameOver || state.power <= 0) return;
-            if(Math.random() * 20 < 10) { 
-                movePaulao();
-            }
-        }, 3500);
     }
+}
 
-    function toggleDoor(side, btn) {
-        if(state.power <= 0 || state.gameOver) {
-            playSound('blip'); 
-            return;
-        }
-        playSound('door'); 
-        let door = document.getElementById(side === 'left' ? 'door-l' : 'door-r');
-        if(side === 'left') {
-            state.doorL = !state.doorL;
-            door.classList.toggle('closed');
-        } else {
-            state.doorR = !state.doorR;
-            door.classList.toggle('closed');
-        }
-        btn.classList.toggle('active');
-        updateUsage();
+function startCustomNight() {
+    // Implementação básica de Custom Night
+    startGame(6);
+}
+
+// ========== PHONE CALLS ==========
+function playPhoneCall(night) {
+    if(state.phoneCallPlaying) return;
+    
+    state.phoneCallPlaying = true;
+    const phoneLayer = document.getElementById('phone-call-layer');
+    const phoneContent = document.getElementById('phone-call-content');
+    
+    phoneLayer.style.display = 'block';
+    
+    // Textos das phone calls (adaptados)
+    const phoneTexts = {
+        1: "Olá? Olá? Então, eu queria gravar uma mensagem para você... para te ajudar a te instalar na sua primeira noite. Acredito que não será problema para você, pois você está bem qualificado para o trabalho.",
+        2: "Olá? Olá? Veja, já estou no segundo dia, então vou tentar manter isso breve e direto. Basicamente, há animatrônicos aqui que vagam durante a noite...",
+        3: "Então, apenas mantenha as portas fechadas. Espere, que horas são? Oh, seis da manhã. Bem, estava na hora de ir mesmo. Boa noite.",
+        4: "Olá? Olá... Estou percebendo que você não está fazendo muito de seus deveres de segurança. E por isso que ainda estou aqui. Boa noite.",
+        5: "Olá? ... ... ... Boa noite."
+    };
+    
+    phoneContent.textContent = phoneTexts[night] || phoneTexts[1];
+    
+    const phoneAudioKey = `phone${night}`;
+    phoneCallAudio = playSound(phoneAudioKey, 0.7);
+    
+    // Auto-skip após duração do áudio + 3 segundos
+    if(phoneCallAudio) {
+        phoneCallAudio.onended = () => {
+            setTimeout(() => {
+                skipPhoneCall();
+            }, 3000);
+        };
+    } else {
+        setTimeout(() => {
+            skipPhoneCall();
+        }, 10000);
     }
+    
+    // Skip ao pressionar qualquer tecla
+    document.addEventListener('keydown', skipPhoneCallOnce);
+}
 
-    function light(side, on) {
-        if(state.power <= 0 || state.gameOver) return;
-        const voidArea = document.getElementById(side === 'left' ? 'void-l' : 'void-r');
-        const paulaoSprite = document.getElementById('paulao-sprite');
+function skipPhoneCallOnce() {
+    skipPhoneCall();
+    document.removeEventListener('keydown', skipPhoneCallOnce);
+}
+
+function skipPhoneCall() {
+    if(!state.phoneCallPlaying) return;
+    
+    state.phoneCallPlaying = false;
+    state.phoneCallPlayed = true;
+    
+    if(phoneCallAudio) {
+        phoneCallAudio.pause();
+        phoneCallAudio = null;
+    }
+    
+    document.getElementById('phone-call-layer').style.display = 'none';
+    
+    if(!state.gameStarted) {
+        state.gameStarted = true;
+        startGameLoops();
+    }
+}
+
+// ========== SISTEMA DE HORAS ==========
+function startGameLoops() {
+    // Obter dificuldade da noite atual
+    const difficulty = NIGHT_DIFFICULTY[state.currentNight] || NIGHT_DIFFICULTY[1];
+    
+    // Timer do jogo
+    gameTimer = setInterval(() => {
+        if(state.gameOver) return;
         
-        if (on) {
-            loops.light.currentTime = 0;
-            loops.light.play(); 
-            voidArea.style.opacity = '0'; 
-            if (side === 'left' && state.paulaoLocation === 'DoorL') {
-                paulaoSprite.className = 'paulao-door-l';
-                paulaoSprite.style.filter = 'brightness(1)'; 
-                playSound('windowscare'); 
-            } else if (side === 'right' && state.paulaoLocation === 'DoorR') {
-                paulaoSprite.className = 'paulao-door-r';
-                paulaoSprite.style.filter = 'brightness(1)';
-                playSound('windowscare');
-            } else {
-                paulaoSprite.className = ''; 
+        state.gameTime++;
+        updateTimeDisplay();
+        
+        // Verificar se chegou às 6 AM
+        if(state.gameTime >= TOTAL_GAME_TIME) {
+            winGame();
+        }
+    }, 1000);
+    
+    // Timer de energia
+    powerTimer = setInterval(() => {
+        if(state.gameOver) return;
+        const currentDifficulty = NIGHT_DIFFICULTY[state.currentNight] || NIGHT_DIFFICULTY[1];
+        let baseDrain = updateUsage() * 0.2;
+        let drain = baseDrain * currentDifficulty.powerDrain; // Dificuldade afeta dreno de energia
+        state.power -= drain;
+        if(state.power < 0) state.power = 0;
+        document.getElementById('power-val').innerText = Math.floor(state.power);
+        if(state.power <= 0 && !state.gameOver) {
+            blackout();
+        }
+    }, 1000);
+    
+    // Timer de AI
+    aiTimer = setInterval(() => {
+        if(state.gameOver || state.power <= 0) return;
+        
+        const currentDifficulty = NIGHT_DIFFICULTY[state.currentNight] || NIGHT_DIFFICULTY[1];
+        
+        // Mover Paulo em cada rota baseado na dificuldade
+        // Cada rota tem sua própria probabilidade baseada na dificuldade
+        if(Math.random() < currentDifficulty.moveChance) {
+            movePaulo('route1');
+        }
+        if(Math.random() < currentDifficulty.moveChance * 0.85) {
+            movePaulo('route2');
+        }
+        if(Math.random() < currentDifficulty.moveChance * 0.7) {
+            movePaulo('route3');
+        }
+        // Foxy (route4) tem mecânica especial - mais raro, mas mais perigoso
+        if(Math.random() < currentDifficulty.moveChance * 0.35) {
+            movePaulo('route4');
+        }
+        
+        // Atualizar câmeras
+        if(state.cameraActive) {
+            switchCam(state.currentCam);
+        }
+        
+        // Verificar se Paulo está nas portas
+        checkDoorThreats();
+        
+    }, difficulty.moveInterval);
+    
+    // Verificar Foxy periodicamente (se não checar, ele avança mais rápido)
+    setInterval(() => {
+        if(state.gameOver || state.power <= 0) return;
+        
+        const timeSinceCheck = Date.now() - state.lastFoxyCheck;
+        const currentDifficulty = NIGHT_DIFFICULTY[state.currentNight] || NIGHT_DIFFICULTY[1];
+        
+        // Foxy avança mais rápido se não verificado
+        if(state.lastFoxyCheck > 0) {
+            let checkThreshold = 25000 - (currentDifficulty.aggressive * 3000); // Mais difícil = threshold menor
+            if(timeSinceCheck > checkThreshold && state.pauloLocations.route4 !== '1A') {
+                // Não checou Foxy há muito tempo, ele avança
+                if(Math.random() < (0.4 * currentDifficulty.aggressive)) {
+                    movePaulo('route4');
+                }
             }
         } else {
-            loops.light.pause(); 
-            voidArea.style.opacity = '0.6'; 
+            // Primeira vez - começar timer
+            if(state.gameTime > 10) {
+                state.lastFoxyCheck = Date.now();
+            }
+        }
+    }, 3000);
+}
+
+function updateTimeDisplay() {
+    const hour = Math.floor(state.gameTime / SECONDS_PER_HOUR);
+    const hours = ['12 AM', '1 AM', '2 AM', '3 AM', '4 AM', '5 AM', '6 AM'];
+    const displayHour = hours[Math.min(hour, 6)];
+    document.getElementById('time-text').innerText = displayHour;
+}
+
+// ========== MOVIMENTO PANORÂMICO ==========
+const officeLayer = document.getElementById('office-layer');
+
+document.addEventListener('mousemove', (e) => {
+    if(document.getElementById('game-view').style.display !== 'block') return;
+    if(state.cameraActive || state.gameOver) return;
+    
+    let width = window.innerWidth;
+    let mouseX = e.clientX;
+    let percent = mouseX / width;
+    let moveX = percent * 10; 
+    
+    officeLayer.style.transform = `translateX(-${moveX}%)`;
+
+    if (percent < 0.15) {
+        document.getElementById('panel-l').classList.add('active-view');
+    } else {
+        document.getElementById('panel-l').classList.remove('active-view');
+    }
+
+    if (percent > 0.85) {
+        document.getElementById('panel-r').classList.add('active-view');
+    } else {
+        document.getElementById('panel-r').classList.remove('active-view');
+    }
+});
+
+// ========== CONTROLES DE PORTA E LUZ ==========
+function toggleDoor(side, btn) {
+    if(state.power <= 0 || state.gameOver) {
+        playSound('blip'); 
+        return;
+    }
+    playSound('door'); 
+    let door = document.getElementById(side === 'left' ? 'door-l' : 'door-r');
+    if(side === 'left') {
+        state.doorL = !state.doorL;
+        door.classList.toggle('closed');
+    } else {
+        state.doorR = !state.doorR;
+        door.classList.toggle('closed');
+    }
+    btn.classList.toggle('active');
+    updateUsage();
+}
+
+function light(side, on) {
+    if(state.power <= 0 || state.gameOver) return;
+    const voidArea = document.getElementById(side === 'left' ? 'void-l' : 'void-r');
+    const paulaoSprite = document.getElementById('paulao-sprite');
+    
+    if (on) {
+        loops.light.currentTime = 0;
+        loops.light.play(); 
+        voidArea.style.opacity = '0'; 
+        
+        // Verificar se Paulo está na porta
+        const routeAtDoor = side === 'left' ? 'route1' : (side === 'right' ? 'route2' : null);
+        if(routeAtDoor && state.pauloLocations[routeAtDoor] === (side === 'left' ? 'DoorL' : 'DoorR')) {
+            paulaoSprite.className = side === 'left' ? 'paulao-door-l' : 'paulao-door-r';
+            paulaoSprite.style.filter = 'brightness(1)'; 
+            playSound('windowscare'); 
+        } else {
             paulaoSprite.className = ''; 
-            paulaoSprite.style.filter = 'brightness(0.2)';
         }
-        updateUsage();
+    } else {
+        loops.light.pause(); 
+        voidArea.style.opacity = '0.6'; 
+        paulaoSprite.className = ''; 
+        paulaoSprite.style.filter = 'brightness(0.2)';
+    }
+    state[side === 'left' ? 'lightL' : 'lightR'] = on;
+    updateUsage();
+}
+
+function checkDoorThreats() {
+    // Verificar se Paulo está tentando entrar pelas portas
+    if(state.pauloLocations.route1 === 'DoorL' && !state.doorL) {
+        triggerJumpscare('route1');
+    }
+    if(state.pauloLocations.route2 === 'DoorR' && !state.doorR) {
+        triggerJumpscare('route2');
+    }
+    if(state.pauloLocations.route3 === 'DoorR' && !state.doorR) {
+        triggerJumpscare('route3');
+    }
+    if(state.pauloLocations.route4 === 'DoorL' && !state.doorL) {
+        triggerJumpscare('route4');
+    }
+}
+
+// ========== SISTEMA DE CÂMERAS ==========
+function toggleMonitor() {
+    if(state.power <= 0 || state.gameOver || isTransitioning) return;
+
+    isTransitioning = true;
+    const transImg = document.getElementById('monitor-transition');
+    const cctv = document.getElementById('cctv-layer');
+
+    let isOpening = !state.cameraActive;
+    let frame = isOpening ? 1 : 11;
+    const step = isOpening ? 1 : -1;
+    
+    if(isOpening) playSound('monitor_open');
+    else playSound('monitor_close');
+
+    transImg.style.display = 'block';
+    transImg.src = `camera_transition/${frame}.png`;
+
+    if (!isOpening) {
+        cctv.style.display = 'none';
+        stopWhiteBars();
     }
 
-    function toggleMonitor() {
-        if(state.power <= 0 || state.gameOver || isTransitioning) return;
-
-        isTransitioning = true;
-        const transImg = document.getElementById('monitor-transition');
-        const cctv = document.getElementById('cctv-layer');
-
-        let isOpening = !state.cameraActive;
-        let frame = isOpening ? 1 : 11;
-        const step = isOpening ? 1 : -1;
-        
-        if(isOpening) playSound('monitor_open');
-        else playSound('monitor_close');
-
-        transImg.style.display = 'block';
+    const animInterval = setInterval(() => {
+        frame += step;
         transImg.src = `camera_transition/${frame}.png`;
 
-        if (!isOpening) {
-            cctv.style.display = 'none';
-            stopWhiteBars();
+        if ((isOpening && frame > 11) || (!isOpening && frame < 1)) {
+            clearInterval(animInterval);
+            isTransitioning = false;
+            transImg.style.display = 'none';
+            
+            state.cameraActive = !state.cameraActive;
+            
+            if (state.cameraActive) {
+                cctv.style.display = 'block';
+                switchCam(state.currentCam);
+                startWhiteBars();
+            } 
+            updateUsage();
         }
+    }, 25);
+}
 
-        const animInterval = setInterval(() => {
-            frame += step;
-            transImg.src = `camera_transition/${frame}.png`;
+function startWhiteBars() {
+    const whiteBarsImg = document.getElementById('white-bars-anim');
+    whiteBarsImg.style.display = 'block';
+    let barFrame = 1;
+    if(whiteBarsInterval) clearInterval(whiteBarsInterval);
+    whiteBarsInterval = setInterval(() => {
+        whiteBarsImg.src = `WHITE_BARS/${barFrame}.png`;
+        barFrame++;
+        if(barFrame > 7) barFrame = 1;
+    }, 50); 
+}
 
-            if ((isOpening && frame > 11) || (!isOpening && frame < 1)) {
-                clearInterval(animInterval);
-                isTransitioning = false;
-                transImg.style.display = 'none';
-                
-                state.cameraActive = !state.cameraActive;
-                
-                if (state.cameraActive) {
-                    cctv.style.display = 'block';
-                    switchCam(state.currentCam);
-                    startWhiteBars();
-                } 
-                updateUsage();
-            }
-        }, 25);
+function stopWhiteBars() {
+    if(whiteBarsInterval) {
+        clearInterval(whiteBarsInterval);
+        whiteBarsInterval = null;
     }
+    document.getElementById('white-bars-anim').style.display = 'none';
+}
 
-    function startWhiteBars() {
-        const whiteBarsImg = document.getElementById('white-bars-anim');
-        whiteBarsImg.style.display = 'block';
-        let barFrame = 1;
-        if(whiteBarsInterval) clearInterval(whiteBarsInterval);
-        whiteBarsInterval = setInterval(() => {
-            whiteBarsImg.src = `WHITE_BARS/${barFrame}.png`;
-            barFrame++;
-            if(barFrame > 7) barFrame = 1;
-        }, 50); 
-    }
+function cycleCam(direction) {
+    const camList = ['1A', '1B', '1C', '2A', '3', '4', '5', '6', '7'];
+    let currentIndex = camList.indexOf(state.currentCam);
+    currentIndex += direction;
+    
+    if(currentIndex < 0) currentIndex = camList.length - 1;
+    if(currentIndex >= camList.length) currentIndex = 0;
+    
+    switchCam(camList[currentIndex]);
+}
 
-    function stopWhiteBars() {
-        if(whiteBarsInterval) {
-            clearInterval(whiteBarsInterval);
-            whiteBarsInterval = null;
-        }
-        document.getElementById('white-bars-anim').style.display = 'none';
-    }
+// Função helper para obter o caminho da imagem do botão da câmera
+function getCameraButtonSrc(camId) {
+    const buttonSources = {
+        '1A': 'CAM_BUTTONS/1-CAM 1A.png',
+        '1B': 'CAM_BUTTONS/1-CAM 1B.png',
+        '1C': 'CAM_BUTTONS/1-CAM 1C.png',
+        '2A': 'CAM_BUTTONS/2-CAM 2A.png',
+        '3': 'CAM_BUTTONS/3-CAM 3.png',
+        '4': 'CAM_BUTTONS/4-CAM 4A.png',
+        '5': 'CAM_BUTTONS/5-CAM 5.png',
+        '6': 'CAM_BUTTONS/6-CAM 6.png',
+        '7': 'CAM_BUTTONS/7-CAM 7.png'
+    };
+    return buttonSources[camId] || null;
+}
 
-    function cycleCam(direction) {
-        const camList = Object.keys(camImages);
-        let currentIndex = camList.indexOf(state.currentCam);
-        currentIndex += direction;
-        
-        if(currentIndex < 0) currentIndex = camList.length - 1;
-        if(currentIndex >= camList.length) currentIndex = 0;
-        
-        switchCam(camList[currentIndex]);
-    }
+function switchCam(camID) {
+    state.currentCam = camID;
+    document.getElementById('cam-name').innerText = "CAM " + camID;
+    playSound('blip'); 
 
-    function switchCam(camID) {
-        state.currentCam = camID;
-        document.getElementById('cam-name').innerText = "CAM " + camID;
-        playSound('blip'); 
+    const feed = document.getElementById('cctv-feed');
+    let bgImage = camImages[camID] ? camImages[camID] : 'cam1.jpg';
+    feed.style.backgroundImage = `url('${bgImage}')`;
 
-        const feed = document.getElementById('cctv-feed');
-        let bgImage = camImages[camID] ? camImages[camID] : 'cam1.jpg';
-        feed.style.backgroundImage = `url('${bgImage}')`;
-
-        const overlay = document.getElementById('paulao-cam-overlay');
-        if(state.paulaoLocation === camID) {
+    // Verificar se Paulo está visível nesta câmera
+    const overlay = document.getElementById('paulao-cam-overlay');
+    overlay.style.display = 'none';
+    
+    // Verificar todas as rotas
+    for(let route in state.pauloLocations) {
+        if(state.pauloLocations[route] === camID && camID !== 'DoorL' && camID !== 'DoorR' && camID !== 'Office') {
             overlay.style.display = 'block';
-            if(camID === '1A') overlay.style.left = '30%'; 
-            else if(camID === '3') overlay.style.left = '60%'; 
+            // Posicionar baseado na câmera
+            if(camID === '1A' || camID === '1B' || camID === '1C') overlay.style.left = '30%';
+            else if(camID === '3') overlay.style.left = '60%';
             else overlay.style.left = '40%';
-        } else {
-            overlay.style.display = 'none';
+            break;
         }
-
-        document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
-        let btnId = "btn-" + camID.toLowerCase();
-        let btn = document.getElementById(btnId);
-        if(btn) btn.classList.add('active');
     }
 
-    function updateUsage() {
-        let usage = 1; 
-        if(state.doorL) usage++;
-        if(state.doorR) usage++;
-        if(state.cameraActive) usage++;
-        
-        if(usage > 5) usage = 5;
-        if(usage < 1) usage = 1;
-
-        const usageImg = document.getElementById('usage-img');
-        if(usageImg) usageImg.src = `USAGE_BAR/${usage}.png`;
-
-        return usage;
-    }
-
-    function movePaulao() {
-        const path = ['1A', '1B', '3', '4', '2A', 'DoorL', 'Office'];
-        let currentIndex = path.indexOf(state.paulaoLocation);
-
-        if(currentIndex === -1) currentIndex = 0;
-        let nextLoc = path[currentIndex + 1];
-
-        playSound('step');
-
-        if (nextLoc === 'Office') {
-            playSound('run');
-            setTimeout(() => {
-                if(state.doorL) {
-                    console.log("Paulão bateu na porta!");
-                    playSound('bang'); 
-                    state.paulaoLocation = '1A'; 
-                } else {
-                    state.paulaoLocation = 'Office';
-                    triggerJumpscare();
-                }
-            }, 2000); 
-        } else {
-            state.paulaoLocation = nextLoc;
+    // Atualizar botões da câmera
+    document.querySelectorAll('.cam-btn').forEach(b => {
+        b.classList.remove('active');
+        const img = b.querySelector('img');
+        if(img) {
+            // Restaurar imagem original
+            const camId = b.id.replace('btn-', '').toUpperCase();
+            const originalSrc = getCameraButtonSrc(camId);
+            if(originalSrc) img.src = originalSrc;
         }
-        if(state.cameraActive) switchCam(state.currentCam);
+    });
+    
+    let btnId = "btn-" + camID.toLowerCase();
+    let btn = document.getElementById(btnId);
+    if(btn) {
+        btn.classList.add('active');
+        const img = btn.querySelector('img');
+        if(img) {
+            // Usar imagem verde quando ativo
+            img.src = 'CAM_BUTTONS/CAM_PRESSED2 (switch animation sequence).png';
+        }
     }
-
-    function blackout() {
-        state.doorL = false; state.doorR = false;
-        state.cameraActive = false;
-        loops.fan.pause();
-        loops.ambience.pause();
-        playSound('powerdown'); 
-        stopWhiteBars();
-
-        document.getElementById('cctv-layer').style.display = 'none';
-        document.getElementById('office-layer').style.backgroundImage = 'none';
-        document.getElementById('office-layer').style.backgroundColor = '#000'; 
-        document.getElementById('hud').style.display = 'none';
-        
-        setTimeout(() => {
-            playSound('darkness');
-        }, 1000);
-
-        setTimeout(triggerJumpscare, 8000);
+    
+    // Se está vendo Foxy (cam 1C = 2A), resetar timer
+    if(camID === '2A') {
+        state.lastFoxyCheck = Date.now();
+        state.foxyChecks++;
+        // Se viu Foxy, pode fazer ele recuar um pouco
+        if(state.pauloLocations.route4 !== '1A' && Math.random() < 0.5) {
+            state.pauloLocations.route4 = '1A';
+        }
     }
+}
 
-    function triggerJumpscare() {
-        if(state.gameOver) return;
-        state.gameOver = true;
-        
-        clearInterval(powerTimer);
-        clearInterval(aiTimer);
-        loops.fan.pause();
-        loops.ambience.pause();
-        stopWhiteBars();
+// ========== USO DE ENERGIA ==========
+function updateUsage() {
+    let usage = 1; // Base
+    if(state.doorL) usage++;
+    if(state.doorR) usage++;
+    if(state.cameraActive) usage++;
+    if(state.lightL) usage += 0.5;
+    if(state.lightR) usage += 0.5;
+    
+    if(usage > 5) usage = 5;
+    if(usage < 1) usage = 1;
 
-        document.getElementById('cctv-layer').style.display = 'none';
-        
-        playSound('scream'); 
+    const usageImg = document.getElementById('usage-img');
+    if(usageImg) usageImg.src = `USAGE_BAR/${Math.ceil(usage)}.png`;
 
-        const attackImg = document.getElementById('paulao-attack');
-        attackImg.style.display = 'block';
+    return usage;
+}
 
-        setTimeout(() => {
-            attackImg.style.display = 'none';
-            document.getElementById('static-screen').style.display = 'block';
-            document.getElementById('game-over-txt').style.display = 'block';
-            playSound('menu_static'); 
-        }, 3000);
-        
-        setTimeout(() => {
-            location.reload();
-        }, 8000);
+// ========== MOVIMENTO DE PAULO ==========
+function movePaulo(route) {
+    const routePaths = PAULO_ROUTES[route];
+    if(!routePaths) return;
+    
+    const currentIndex = routePaths.indexOf(state.pauloLocations[route]);
+    if(currentIndex === -1) {
+        state.pauloLocations[route] = routePaths[0];
+        return;
     }
+    
+    // Mecânica especial para Foxy (route4)
+    if(route === 'route4') {
+        // Foxy só avança se não for verificado por muito tempo
+        const timeSinceCheck = Date.now() - state.lastFoxyCheck;
+        if(state.lastFoxyCheck > 0 && timeSinceCheck < 10000) {
+            // Verificado recentemente, menos chance de avançar
+            if(Math.random() > 0.3) return;
+        }
+    }
+    
+    // Verificar se pode avançar
+    if(currentIndex >= routePaths.length - 1) {
+        // Já está no final da rota
+        if(routePaths[currentIndex] === 'Office') {
+            triggerJumpscare(route);
+        }
+        return;
+    }
+    
+    const nextLoc = routePaths[currentIndex + 1];
+    
+    // Verificar se há porta fechada bloqueando
+    if(nextLoc === 'DoorL' && state.doorL) {
+        // Porta fechada, tocar som de batida e recuar
+        playSound('bang');
+        state.pauloLocations[route] = routePaths[Math.max(0, currentIndex - 1)];
+        return;
+    }
+    if(nextLoc === 'DoorR' && state.doorR) {
+        playSound('bang');
+        state.pauloLocations[route] = routePaths[Math.max(0, currentIndex - 1)];
+        return;
+    }
+    
+    // Avançar
+    playSound('step');
+    
+    if(nextLoc === 'Office') {
+        // Correndo para o escritório
+        playSound('run');
+        setTimeout(() => {
+            if((route === 'route1' || route === 'route4') && state.doorL) {
+                playSound('bang');
+                state.pauloLocations[route] = routePaths[Math.max(0, currentIndex - 2)];
+            } else if((route === 'route2' || route === 'route3') && state.doorR) {
+                playSound('bang');
+                state.pauloLocations[route] = routePaths[Math.max(0, currentIndex - 2)];
+            } else {
+                state.pauloLocations[route] = 'Office';
+                triggerJumpscare(route);
+            }
+        }, 2000);
+    } else {
+        state.pauloLocations[route] = nextLoc;
+    }
+    
+    // Se está na porta e a luz está acesa, mostrar
+    if(nextLoc === 'DoorL' || nextLoc === 'DoorR') {
+        if(state.lightL && nextLoc === 'DoorL') {
+            const paulaoSprite = document.getElementById('paulao-sprite');
+            paulaoSprite.className = 'paulao-door-l';
+            paulaoSprite.style.filter = 'brightness(1)';
+            paulaoSprite.style.display = 'block';
+        } else if(state.lightR && nextLoc === 'DoorR') {
+            const paulaoSprite = document.getElementById('paulao-sprite');
+            paulaoSprite.className = 'paulao-door-r';
+            paulaoSprite.style.filter = 'brightness(1)';
+            paulaoSprite.style.display = 'block';
+        }
+    }
+}
+
+// ========== BLACKOUT E GAME OVER ==========
+function blackout() {
+    state.doorL = false; state.doorR = false;
+    state.cameraActive = false;
+    loops.fan.pause();
+    loops.ambience.pause();
+    playSound('powerdown'); 
+    stopWhiteBars();
+
+    document.getElementById('cctv-layer').style.display = 'none';
+    document.getElementById('office-layer').style.backgroundImage = 'none';
+    document.getElementById('office-layer').style.backgroundColor = '#000'; 
+    document.getElementById('hud').style.display = 'none';
+    document.getElementById('time-display').style.display = 'none';
+    
+    setTimeout(() => {
+        playSound('darkness');
+    }, 1000);
+
+    setTimeout(() => {
+        triggerJumpscare('blackout');
+    }, 8000);
+}
+
+function triggerJumpscare(route) {
+    if(state.gameOver) return;
+    state.gameOver = true;
+    
+    clearInterval(powerTimer);
+    clearInterval(aiTimer);
+    clearInterval(gameTimer);
+    loops.fan.pause();
+    loops.ambience.pause();
+    loops.light.pause();
+    stopWhiteBars();
+
+    document.getElementById('cctv-layer').style.display = 'none';
+    document.getElementById('hud').style.display = 'none';
+    document.getElementById('time-display').style.display = 'none';
+    
+    playSound('scream'); 
+
+    const attackImg = document.getElementById('paulao-attack');
+    attackImg.style.display = 'block';
+
+    setTimeout(() => {
+        attackImg.style.display = 'none';
+        document.getElementById('static-screen').style.display = 'block';
+        document.getElementById('game-over-txt').style.display = 'block';
+        playSound('menu_static'); 
+    }, 3000);
+    
+    // Limpar save ao morrer
+    localStorage.removeItem('fnaf_paulao_save');
+    
+    setTimeout(() => {
+        location.reload();
+    }, 8000);
+}
+
+function winGame() {
+    if(state.gameOver) return;
+    state.gameOver = true;
+    
+    clearInterval(powerTimer);
+    clearInterval(aiTimer);
+    clearInterval(gameTimer);
+    loops.fan.pause();
+    loops.ambience.pause();
+    loops.light.pause();
+    stopWhiteBars();
+    
+    playSound('win');
+    
+    document.getElementById('game-view').style.display = 'none';
+    document.getElementById('win-screen').style.display = 'block';
+    
+    // Salvar progresso
+    if(state.currentNight < 6) {
+        const nextNight = state.currentNight + 1;
+        localStorage.setItem('fnaf_paulao_save', JSON.stringify({
+            night: nextNight
+        }));
+    } else {
+        // Completou todas as noites
+        localStorage.removeItem('fnaf_paulao_save');
+    }
+}
+
+// ========== SALVAMENTO AUTOMÁTICO ==========
+setInterval(() => {
+    if(state.gameStarted && !state.gameOver && state.gameTime > 30) {
+        localStorage.setItem('fnaf_paulao_save', JSON.stringify({
+            night: state.currentNight,
+            gameTime: state.gameTime,
+            power: state.power
+        }));
+    }
+}, 30000); // Salvar a cada 30 segundos
 
 </script>
 </body>
