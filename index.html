@@ -2,19 +2,115 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Five Nights at Paulão - Foxy Style Jumpscare</title>
+<title>Five Nights at Paulão - Final Definitive Edition</title>
 <style>
-    /* --- CSS: VISUAL E ESTILO --- */
+    /* --- CSS GERAL --- */
     body {
         margin: 0;
         background: #000;
         overflow: hidden;
         font-family: 'Courier New', Courier, monospace;
         user-select: none;
+        color: white;
     }
 
-    /* O EFEITO 3D PANORÂMICO */
+    /* --- MENU PRINCIPAL --- */
+    #main-menu {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: black;
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    /* FUNDO DE ESTÁTICA */
+    #static-bg {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0.4;
+        z-index: 1000;
+        animation: static-loop 0.3s steps(1) infinite;
+    }
+
+    @keyframes static-loop {
+        0%   { background-image: url('staticpngs/1.png'); }
+        12.5% { background-image: url('staticpngs/2.png'); }
+        25%  { background-image: url('staticpngs/3.png'); }
+        37.5% { background-image: url('staticpngs/4.png'); }
+        50%  { background-image: url('staticpngs/5.png'); }
+        62.5% { background-image: url('staticpngs/6.png'); }
+        75%  { background-image: url('staticpngs/7.png'); }
+        87.5% { background-image: url('staticpngs/8.png'); }
+        100% { background-image: url('staticpngs/1.png'); }
+    }
+
+    /* O Paulão no Menu */
+    #menu-paulao {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        height: 100vh;
+        width: auto;
+        max-width: 60vw;
+        object-fit: cover;
+        z-index: 1001;
+        filter: brightness(0.5) contrast(1.3) sepia(0.3);
+        pointer-events: none;
+    }
+
+    /* Texto do Menu */
+    #menu-content {
+        position: absolute;
+        top: 15%;
+        left: 10%;
+        z-index: 1002;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #game-title {
+        font-size: 4rem;
+        font-weight: bold;
+        text-shadow: 4px 4px 0px #500;
+        margin-bottom: 40px;
+        border-left: 5px solid #500;
+        padding-left: 20px;
+        animation: glitch-text 0.3s infinite; 
+    }
+
+    .menu-option {
+        font-size: 1.8rem;
+        margin: 10px 0;
+        cursor: pointer;
+        width: fit-content;
+        transition: 0.1s;
+        font-weight: bold;
+        color: #ccc;
+    }
+    .menu-option:hover {
+        color: #fff;
+        text-shadow: 0 0 10px #fff;
+    }
+    .menu-option::before {
+        content: ">> ";
+        opacity: 0;
+    }
+    .menu-option:hover::before {
+        opacity: 1;
+    }
+
+    .scanlines-menu {
+        position: absolute; top:0; left:0; width:100%; height:100%;
+        background: repeating-linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 1px, transparent 2px, transparent 4px);
+        pointer-events: none;
+        z-index: 2001;
+    }
+
+    /* --- JOGO --- */
     #game-view {
+        display: none; 
         width: 100vw;
         height: 100vh;
         position: relative;
@@ -33,7 +129,6 @@
         transition: transform 0.1s linear;
     }
 
-    /* CONTROLES DAS PORTAS */
     .door-panel {
         position: absolute;
         top: 40%;
@@ -67,7 +162,6 @@
     .btn-door.active { background: #0f0; box-shadow: 0 0 15px #0f0; }
     .btn-light.active { background: #ff0; box-shadow: 0 0 15px #ff0; }
 
-    /* PORTAS VISUAIS */
     .heavy-door {
         position: absolute;
         top: 0;
@@ -80,10 +174,8 @@
     }
     #door-l { left: 0; transform: translateY(-100%); border-right: 5px solid #000; }
     #door-r { right: 0; transform: translateY(-100%); border-left: 5px solid #000; }
-    
     .closed { transform: translateY(0) !important; }
 
-    /* LUZES NAS PORTAS */
     .door-void {
         position: absolute;
         top: 0;
@@ -97,7 +189,6 @@
     #void-l { left: 0; }
     #void-r { right: 0; }
 
-    /* SISTEMA DE CÂMERAS */
     #monitor-btn {
         position: absolute;
         bottom: 20px;
@@ -134,7 +225,6 @@
         position: relative;
     }
     
-    /* Paulão aparecendo na câmera */
     #paulao-cam-overlay {
         display: none;
         position: absolute;
@@ -179,7 +269,6 @@
     #btn-3  { top: 50px; right: 40px; } 
     #btn-4  { bottom: 20px; right: 80px; } 
 
-    /* PAULÃO NA PORTA (IDLE) */
     #paulao-sprite {
         position: absolute;
         display: none;
@@ -192,35 +281,55 @@
     .paulao-door-l { left: 12%; display: block !important; }
     .paulao-door-r { right: 12%; display: block !important; }
 
-    /* --- NOVO JUMPSCARE ESTILO FOXY --- */
+    /* TRANSIÇÃO DO MONITOR */
+    #monitor-transition {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        z-index: 200; 
+        object-fit: cover;
+        pointer-events: none;
+    }
+
+    /* JUMPSCARE */
     #paulao-attack {
         display: none;
         position: absolute;
-        left: 0; /* Cola na esquerda */
+        left: 0;
         bottom: 0;
-        height: 100vh; /* Ocupa altura toda */
-        width: 60vw; /* Ocupa um pouco mais da metade da tela */
-        object-fit: cover;
-        z-index: 200; /* Em cima de tudo */
-        /* Animação frenética de tremedeira */
+        height: auto; 
+        max-width: 80vw; 
+        max-height: 100vh;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        z-index: 200;
         animation: foxy-shake 0.15s infinite;
         filter: contrast(1.5) brightness(0.8);
-        border-right: 5px solid black; /* Borda pra parecer que sai da porta */
+        pointer-events: none;
     }
 
     @keyframes foxy-shake {
         0% { transform: translateX(0) scale(1); }
-        25% { transform: translateX(15px) scale(1.02); }
-        50% { transform: translateX(5px) scale(1.05); }
-        75% { transform: translateX(20px) scale(1.02); }
+        25% { transform: translateX(10px) scale(1.02); }
+        50% { transform: translateX(0px) scale(1.05); }
+        75% { transform: translateX(15px) scale(1.02); }
         100% { transform: translateX(0) scale(1); }
     }
+    
+    @keyframes glitch-text {
+        0% { opacity: 1; transform: skewX(0deg); }
+        90% { opacity: 1; transform: skewX(0deg); }
+        92% { opacity: 0.8; transform: skewX(20deg); }
+        94% { opacity: 1; transform: skewX(0deg); }
+        96% { opacity: 0.8; transform: skewX(-20deg); }
+        100% { opacity: 1; }
+    }
 
-    /* TELA DE GAME OVER FINAL (Estática) */
     #static-screen {
         display: none;
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); /* Gif de estática */
+        background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); 
         background-size: cover;
         z-index: 300;
         opacity: 0.8;
@@ -230,7 +339,6 @@
         color: red; font-size: 3rem; font-weight: bold; display: none; z-index: 301;
     }
 
-    /* HUD */
     #hud {
         position: absolute;
         bottom: 20px; left: 20px;
@@ -249,6 +357,24 @@
 
 <audio id="sfx-scare" src="scare.mp3"></audio> 
 <audio id="sfx-ambience" src="ambience.mp3" loop></audio>
+
+<div id="main-menu">
+    <div id="static-bg"></div>
+    <div class="scanlines-menu"></div>
+    
+    <div id="menu-content">
+        <div id="game-title">Five Nights<br>at Paulão</div>
+        <div class="menu-option" onclick="startGame()">New Game</div>
+        <div class="menu-option">Continue</div>
+        <div class="menu-option">6th Night</div>
+        <div class="menu-option">Custom Night</div>
+        <div style="margin-top: 30px; font-size: 0.8rem; color: #555;">(C) 2025 Predo Games</div>
+    </div>
+
+    <img id="menu-paulao" src="paulo_menu1.png">
+</div>
+
+<img id="monitor-transition" src="">
 
 <img id="paulao-attack" src="paulao_susto.png">
 
@@ -324,16 +450,65 @@
 
     let aiTimer = null;
     let powerTimer = null;
+    let menuGlitchTimer = null; 
+    let isTransitioning = false; 
 
     const officeLayer = document.getElementById('office-layer');
     document.addEventListener('mousemove', (e) => {
+        if(document.getElementById('game-view').style.display !== 'block') return;
         if(state.cameraActive || state.gameOver) return;
+
         let width = window.innerWidth;
         let mouseX = e.clientX;
         let percent = mouseX / width;
         let moveX = percent * 20; 
         officeLayer.style.transform = `translateX(-${moveX}%)`;
     });
+
+    function menuGlitchLoop() {
+        if(document.getElementById('game-view').style.display === 'block') return; 
+
+        let timeToNext = Math.random() * 3000 + 1000;
+
+        menuGlitchTimer = setTimeout(() => {
+            const img = document.getElementById('menu-paulao');
+            img.src = 'paulo_menu2.png'; 
+            
+            setTimeout(() => {
+                img.src = 'paulo_menu1.png'; 
+                menuGlitchLoop();
+            }, Math.random() * 170 + 50);
+
+        }, timeToNext);
+    }
+
+    menuGlitchLoop();
+
+    function startGame() {
+        document.getElementById('main-menu').style.display = 'none';
+        clearTimeout(menuGlitchTimer);
+        document.getElementById('game-view').style.display = 'block';
+        document.getElementById('sfx-ambience').play().catch(e => console.log("Ambience error"));
+        startLoops();
+    }
+
+    function startLoops() {
+        powerTimer = setInterval(() => {
+            if(state.gameOver) return;
+            let drain = updateUsage() * 0.2; 
+            state.power -= drain;
+            if(state.power < 0) state.power = 0;
+            document.getElementById('power-val').innerText = Math.floor(state.power);
+            if(state.power <= 0) blackout();
+        }, 1000);
+
+        aiTimer = setInterval(() => {
+            if(state.gameOver || state.power <= 0) return;
+            if(Math.random() * 20 < 10) { 
+                movePaulao();
+            }
+        }, 3500);
+    }
 
     function toggleDoor(side, btn) {
         if(state.power <= 0 || state.gameOver) return;
@@ -373,20 +548,56 @@
         updateUsage();
     }
 
+    // --- FUNÇÃO DO MONITOR ATUALIZADA (BIDIRECIONAL) ---
     function toggleMonitor() {
-        if(state.power <= 0 || state.gameOver) return;
-        state.cameraActive = !state.cameraActive;
+        if(state.power <= 0 || state.gameOver || isTransitioning) return;
+
+        isTransitioning = true;
+        const transImg = document.getElementById('monitor-transition');
         const cctv = document.getElementById('cctv-layer');
         const btn = document.getElementById('monitor-btn');
-        if(state.cameraActive) {
-            cctv.style.display = 'block';
-            btn.classList.add('monitor-open');
-            switchCam(state.currentCam); 
-        } else {
+
+        // Configuração da direção da animação
+        let isOpening = !state.cameraActive; // Se não está ativa, vamos abrir
+        let frame = isOpening ? 1 : 11; // Começa no 1 se abrir, 11 se fechar
+        const step = isOpening ? 1 : -1; // Incrementa ou decrementa
+        const endFrame = isOpening ? 11 : 1; // Onde para
+
+        // Mostra a camada de transição e seta o primeiro frame
+        transImg.style.display = 'block';
+        transImg.src = `camera_transition/${frame}.png`;
+
+        // Se estiver fechando, esconde o CCTV imediatamente para vermos a animação sobre o escritório
+        if (!isOpening) {
             cctv.style.display = 'none';
             btn.classList.remove('monitor-open');
         }
-        updateUsage();
+
+        const frameRate = 25; // Velocidade da animação (ms)
+
+        const animInterval = setInterval(() => {
+            frame += step;
+            transImg.src = `camera_transition/${frame}.png`;
+
+            // Verifica se chegou ao fim (se abrindo > 11, se fechando < 1)
+            if ((isOpening && frame > 11) || (!isOpening && frame < 1)) {
+                clearInterval(animInterval);
+                isTransitioning = false;
+                transImg.style.display = 'none';
+                
+                // Inverte o estado real
+                state.cameraActive = !state.cameraActive;
+                
+                // Se acabou de abrir, mostra a tela da câmera
+                if (state.cameraActive) {
+                    cctv.style.display = 'block';
+                    btn.classList.add('monitor-open');
+                    switchCam(state.currentCam);
+                } 
+                
+                updateUsage();
+            }
+        }, frameRate);
     }
 
     function switchCam(camID) {
@@ -427,24 +638,6 @@
         return usage;
     }
 
-    function startGame() {
-        powerTimer = setInterval(() => {
-            if(state.gameOver) return;
-            let drain = updateUsage() * 0.2; 
-            state.power -= drain;
-            if(state.power < 0) state.power = 0;
-            document.getElementById('power-val').innerText = Math.floor(state.power);
-            if(state.power <= 0) blackout();
-        }, 1000);
-
-        aiTimer = setInterval(() => {
-            if(state.gameOver || state.power <= 0) return;
-            if(Math.random() * 20 < 10) { 
-                movePaulao();
-            }
-        }, 3500);
-    }
-
     function movePaulao() {
         const path = ['1A', '1B', '3', '4', '2A', 'DoorL', 'Office'];
         let currentIndex = path.indexOf(state.paulaoLocation);
@@ -476,40 +669,29 @@
         setTimeout(triggerJumpscare, 5000);
     }
 
-    // --- NOVA FUNÇÃO DE JUMPSCARE (Estilo Foxy) ---
     function triggerJumpscare() {
         if(state.gameOver) return;
         state.gameOver = true;
         
-        // Para os timers
         clearInterval(powerTimer);
         clearInterval(aiTimer);
 
-        // Força fechar o monitor se estiver aberto
-        const cctv = document.getElementById('cctv-layer');
-        cctv.style.display = 'none';
-        
-        // Toca o grito
+        document.getElementById('cctv-layer').style.display = 'none';
         document.getElementById('sfx-scare').play().catch(e => console.log("Audio needs interaction"));
 
-        // MOSTRA O SUSTO DO FOXY (Esquerda)
         const attackImg = document.getElementById('paulao-attack');
         attackImg.style.display = 'block';
 
-        // Depois de 2 segundos, tela de estática
         setTimeout(() => {
             attackImg.style.display = 'none';
             document.getElementById('static-screen').style.display = 'block';
             document.getElementById('game-over-txt').style.display = 'block';
         }, 3000);
         
-        // Recarrega depois de 8 segs
         setTimeout(() => {
             location.reload();
         }, 8000);
     }
-
-    startGame();
 
 </script>
 </body>
