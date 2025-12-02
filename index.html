@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Five Nights at Paulão - Audio Update</title>
+<title>Five Nights at Paulão - 3D Buttons & Doors (Fixed)</title>
 <style>
     /* --- CSS GERAL --- */
     body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', Courier, monospace; user-select: none; color: white; }
@@ -22,37 +22,115 @@
     .menu-option:hover::before { opacity: 1; }
     .scanlines-menu { position: absolute; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 1px, transparent 2px, transparent 4px); pointer-events: none; z-index: 2001; }
 
-    /* --- JOGO --- */
-    #game-view { display: none; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
-    #office-layer { position: absolute; top: 0; left: 0; width: 130%; height: 100%; background-image: url('office_bg.png'); background-size: cover; background-position: center; transition: transform 0.1s linear; }
+    /* --- JOGO (AMBIENTE 3D) --- */
+    #game-view { 
+        display: none; width: 100vw; height: 100vh; position: relative; overflow: hidden; 
+        perspective: 1000px; 
+    }
     
-    .door-panel { position: absolute; top: 40%; width: 60px; height: 150px; background: #333; border: 2px solid #555; display: flex; flex-direction: column; justify-content: space-around; align-items: center; z-index: 10; box-shadow: inset 0 0 10px #000; }
-    .panel-left { left: 0; border-right: none; border-radius: 0 10px 10px 0; }
-    .panel-right { right: 0; border-left: none; border-radius: 10px 0 0 10px; }
-    
-    .btn { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid #222; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.1s; }
-    .btn-door { background: #500; color: white; }
-    .btn-light { background: #ccc; color: black; }
-    .btn-door.active { background: #0f0; box-shadow: 0 0 15px #0f0; }
-    .btn-light.active { background: #ff0; box-shadow: 0 0 15px #ff0; }
+    .vignette { position: absolute; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 0 0 150px rgba(0,0,0,0.9); z-index: 25; pointer-events: none; }
 
-    .heavy-door { position: absolute; top: 0; width: 18%; height: 100%; background: repeating-linear-gradient(90deg, #111, #222 10px, #111 20px); border-right: 5px solid #000; transition: transform 0.2s ease-in; z-index: 5; }
-    #door-l { left: 0; transform: translateY(-100%); border-right: 5px solid #000; }
-    #door-r { right: 0; transform: translateY(-100%); border-left: 5px solid #000; }
+    #office-layer { 
+        position: absolute; top: 0; left: 0; 
+        width: 120%; 
+        height: 100%; 
+        background-image: url('office_bg.png'); 
+        background-size: cover; 
+        background-position: center; 
+        transition: transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+    }
+    
+    /* PAINÉIS DE PORTA (Com Z-INDEX ajustado para receber clique) */
+    .door-panel { 
+        position: absolute; top: 35%; width: 70px; height: 200px; 
+        background: linear-gradient(to right, #222, #111); 
+        border: 2px solid #444; 
+        border-radius: 5px;
+        display: flex; flex-direction: column; justify-content: space-around; align-items: center; 
+        z-index: 40; /* ALTO O SUFICIENTE PARA CLICAR */
+        box-shadow: 0 0 20px #000;
+        transition: transform 0.3s ease-out, opacity 0.3s;
+        transform-style: preserve-3d;
+        opacity: 0.8; 
+    }
+
+    /* Posições Iniciais (Meio escondidos) */
+    .panel-left { 
+        left: -10px; 
+        border-left: none; 
+        transform: rotateY(45deg) translateX(-30px); 
+        transform-origin: left center;
+    }
+    .panel-right { 
+        right: -10px; 
+        border-right: none; 
+        transform: rotateY(-45deg) translateX(30px);
+        transform-origin: right center;
+    }
+    
+    /* ATIVAÇÃO 3D */
+    .panel-left.active-view {
+        transform: rotateY(10deg) translateX(10px); 
+        opacity: 1;
+        left: 20px;
+    }
+    .panel-right.active-view {
+        transform: rotateY(-10deg) translateX(-10px); 
+        opacity: 1;
+        right: 20px;
+    }
+
+    /* BOTÕES 3D */
+    .btn { 
+        width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
+        border: 4px solid #111; 
+        font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; 
+        transition: 0.1s; 
+        box-shadow: 2px 2px 5px #000;
+        position: relative;
+        transform: translateZ(5px);
+    }
+    .btn:active { transform: translateZ(2px); box-shadow: 0 0 2px #000; }
+    .btn-door { background: radial-gradient(circle, #f55, #900); color: white; text-shadow: 1px 1px 0 #000; }
+    .btn-light { background: radial-gradient(circle, #fff, #aaa); color: black; }
+    .btn-door.active { background: radial-gradient(circle, #5f5, #090); box-shadow: 0 0 20px #0f0; }
+    .btn-light.active { background: radial-gradient(circle, #ff9, #cc0); box-shadow: 0 0 25px #ff0; }
+
+    /* PORTAS INDUSTRIAIS */
+    .heavy-door { 
+        position: absolute; top: 0; width: 18%; height: 100%; 
+        background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 50%, #111 100%);
+        border: 1px solid #000;
+        transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1); 
+        z-index: 5;
+        box-shadow: inset 0 0 50px #000;
+        transform-origin: top center;
+    }
+    .heavy-door::after {
+        content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 30px;
+        background: repeating-linear-gradient(45deg, #aa0, #aa0 10px, #000 10px, #000 20px);
+        border-top: 2px solid #000;
+    }
+    
+    #door-l { left: 0; transform: translateY(-100%); border-right: 8px solid #080808; }
+    #door-r { right: 0; transform: translateY(-100%); border-left: 8px solid #080808; }
     .closed { transform: translateY(0) !important; }
 
     .door-void { position: absolute; top: 0; width: 20%; height: 100%; background: black; opacity: 0.6; z-index: 4; transition: opacity 0.1s; }
     #void-l { left: 0; } #void-r { right: 0; }
 
-    /* MONITOR */
-    #monitor-btn { position: absolute; bottom: 20px; right: 30%; width: 40%; height: 30px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; text-align: center; line-height: 30px; cursor: pointer; z-index: 100; font-weight: bold; transition: background 0.3s; }
-    #monitor-btn:hover { background: rgba(255,255,255,0.3); }
-    #monitor-btn.monitor-open { background: rgba(255,255,255,0.5); border-color: #0f0; color: #0f0; }
+    /* MONITOR FLIP */
+    #monitor-trigger { 
+        position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 400px; height: 60px; z-index: 100; cursor: pointer; transition: bottom 0.2s;
+    }
+    #monitor-trigger:hover { bottom: 0px; }
+    #monitor-trigger img { width: 100%; height: 100%; object-fit: contain; }
 
     #cctv-layer { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 50; border: 5px solid #333; }
     #cctv-feed { width: 100%; height: 100%; background-color: #111; background-size: cover; background-position: center; position: relative; }
     #paulao-cam-overlay { display: none; position: absolute; top: 20%; left: 30%; height: 60%; filter: grayscale(0.8) contrast(1.2); }
     .scanlines { position: absolute; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 1px, transparent 2px, transparent 4px); pointer-events: none; z-index: 55; }
+    #white-bars-anim { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.15; z-index: 52; pointer-events: none; mix-blend-mode: screen; display: none; object-fit: cover; }
 
     #map-ui { position: absolute; bottom: 60px; right: 50px; width: 250px; height: 180px; background-image: url('map.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 60; }
     .cam-btn { width: 45px; height: 25px; background: #222; color: #fff; border: 1px solid #555; position: absolute; cursor: pointer; font-size: 10px; opacity: 0.7; }
@@ -76,8 +154,10 @@
     #static-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); background-size: cover; z-index: 300; opacity: 0.8; }
     #game-over-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; font-size: 3rem; font-weight: bold; display: none; z-index: 301; }
 
+    /* HUD E USAGE BAR */
     #hud { position: absolute; bottom: 20px; left: 20px; color: white; font-size: 1.2rem; z-index: 20; text-shadow: 1px 1px 0 #000; }
-    .battery-bar { display: inline-block; width: 15px; height: 25px; background: #0f0; margin-right: 3px; border: 1px solid #fff; }
+    #usage-container { margin-top: 5px; }
+    #usage-img { height: 25px; display: block; }
 </style>
 </head>
 <body>
@@ -97,11 +177,13 @@
 </div>
 
 <img id="monitor-transition" src="">
-<img id="paulao-attack" src="paulo_menu2.png">
+<img id="paulao-attack" src="paulao_susto.png">
 <div id="static-screen"></div>
 <div id="game-over-txt">GAME OVER</div>
 
 <div id="game-view">
+    <div class="vignette"></div> 
+    
     <div id="office-layer">
         <div id="void-l" class="door-void"></div>
         <div id="void-r" class="door-void"></div>
@@ -111,26 +193,32 @@
     <div id="door-l" class="heavy-door"></div>
     <div id="door-r" class="heavy-door"></div>
 
-    <div class="door-panel panel-left">
+    <div id="panel-l" class="door-panel panel-left">
         <div class="btn btn-door" onclick="toggleDoor('left', this)">DOOR</div>
         <div class="btn btn-light" onmousedown="light('left', true)" onmouseup="light('left', false)">LIGHT</div>
     </div>
 
-    <div class="door-panel panel-right">
+    <div id="panel-r" class="door-panel panel-right">
         <div class="btn btn-door" onclick="toggleDoor('right', this)">DOOR</div>
         <div class="btn btn-light" onmousedown="light('right', true)" onmouseup="light('right', false)">LIGHT</div>
     </div>
 
     <div id="hud">
         <div id="power">Power left: <span id="power-val">100</span>%</div>
-        <div id="usage">Usage: <span id="usage-bars"></span></div>
+        <div id="usage-container">
+            Usage: <br>
+            <img id="usage-img" src="USAGE_BAR/1.png" alt="Usage Level">
+        </div>
         <div style="position: fixed; top: 20px; right: 20px; font-size: 2rem;">12 AM <br> <span style="font-size:1rem">Night 1</span></div>
     </div>
 
-    <div id="monitor-btn" onclick="toggleMonitor()"> < MONITOR > </div>
+    <div id="monitor-trigger" onclick="toggleMonitor()">
+        <img src="0-FLIP.png" alt="Monitor Flip">
+    </div>
 
     <div id="cctv-layer">
         <div class="scanlines"></div>
+        <img id="white-bars-anim" src="WHITE_BARS/1.png">
         <div id="cctv-feed">
             <img id="paulao-cam-overlay" src="paulao.png">
         </div> 
@@ -148,7 +236,6 @@
 </div>
 
 <script>
-    /* --- CONFIGURAÇÃO DE ÁUDIO --- */
     const audioFiles = {
         menu_static: 'audio/static2.wav',
         blip: 'audio/blip3.wav',
@@ -167,7 +254,6 @@
         win: 'audio/chimes 2.wav'
     };
 
-    // Objetos de áudio persistentes (loops)
     const loops = {
         menu: new Audio(audioFiles.menu_static),
         fan: new Audio(audioFiles.fan),
@@ -175,23 +261,19 @@
         light: new Audio(audioFiles.light_hum)
     };
 
-    // Configuração dos loops
     loops.menu.loop = true;
     loops.fan.loop = true;
     loops.ambience.loop = true;
     loops.light.loop = true;
-    loops.menu.volume = 0.3; // Estática do menu mais baixa
+    loops.menu.volume = 0.3; 
 
-    // Função Helper para tocar sons pontuais (SFX)
     function playSound(key) {
         if(audioFiles[key]) {
             const sfx = new Audio(audioFiles[key]);
             sfx.volume = 0.8;
-            sfx.play().catch(e => {}); // Ignora erros de autoplay
+            sfx.play().catch(e => {}); 
         }
     }
-
-    /* --- LÓGICA DO JOGO --- */
 
     const state = {
         power: 100,
@@ -207,35 +289,53 @@
         '1A': 'cam1.jpg',
         '1B': 'cam2.jpg',
         '2A': 'cam2.jpg',
-        '3':  'cam3.jpg',
+        '3':  'cam3.png',
         '4':  'cam4.jpg'
     };
 
     let aiTimer = null;
     let powerTimer = null;
     let menuGlitchTimer = null; 
-    let isTransitioning = false; 
+    let isTransitioning = false;
+    let whiteBarsInterval = null; 
 
-    // Inicia som do menu ao interagir com a página (necessário em alguns navegadores)
     document.addEventListener('click', () => {
         if(document.getElementById('main-menu').style.display !== 'none') {
             loops.menu.play().catch(()=>{});
         }
     }, {once:true});
 
-    // Efeito Panorama
+    // --- LÓGICA DE MOVIMENTO PANORÂMICO E GATILHOS 3D ---
     const officeLayer = document.getElementById('office-layer');
+    
     document.addEventListener('mousemove', (e) => {
         if(document.getElementById('game-view').style.display !== 'block') return;
         if(state.cameraActive || state.gameOver) return;
+        
         let width = window.innerWidth;
         let mouseX = e.clientX;
         let percent = mouseX / width;
-        let moveX = percent * 20; 
+        let moveX = percent * 10; 
+        
+        // Move o fundo
         officeLayer.style.transform = `translateX(-${moveX}%)`;
+
+        // LÓGICA DOS "3 RETÂNGULOS VIRTUAIS"
+        // < 15% da tela = Esquerda
+        if (percent < 0.15) {
+            document.getElementById('panel-l').classList.add('active-view');
+        } else {
+            document.getElementById('panel-l').classList.remove('active-view');
+        }
+
+        // > 85% da tela = Direita
+        if (percent > 0.85) {
+            document.getElementById('panel-r').classList.add('active-view');
+        } else {
+            document.getElementById('panel-r').classList.remove('active-view');
+        }
     });
 
-    // Menu Glitch
     function menuGlitchLoop() {
         if(document.getElementById('game-view').style.display === 'block') return; 
         let timeToNext = Math.random() * 30000 + 1000;
@@ -250,18 +350,14 @@
     }
     menuGlitchLoop();
 
-    // START GAME
     function startGame() {
         playSound('blip');
-        loops.menu.pause(); // Para som do menu
+        loops.menu.pause(); 
         document.getElementById('main-menu').style.display = 'none';
         clearTimeout(menuGlitchTimer);
         document.getElementById('game-view').style.display = 'block';
-        
-        // Inicia Ambiente
         loops.fan.play();
         loops.ambience.play();
-
         startLoops();
     }
 
@@ -285,12 +381,10 @@
 
     function toggleDoor(side, btn) {
         if(state.power <= 0 || state.gameOver) {
-            playSound('blip'); // Som de erro se sem energia
+            playSound('blip'); 
             return;
         }
-        
-        playSound('door'); // SOM DA PORTA
-
+        playSound('door'); 
         let door = document.getElementById(side === 'left' ? 'door-l' : 'door-r');
         if(side === 'left') {
             state.doorL = !state.doorL;
@@ -305,18 +399,17 @@
 
     function light(side, on) {
         if(state.power <= 0 || state.gameOver) return;
-        
         const voidArea = document.getElementById(side === 'left' ? 'void-l' : 'void-r');
         const paulaoSprite = document.getElementById('paulao-sprite');
         
         if (on) {
             loops.light.currentTime = 0;
-            loops.light.play(); // TOCA SOM DA LUZ
+            loops.light.play(); 
             voidArea.style.opacity = '0'; 
             if (side === 'left' && state.paulaoLocation === 'DoorL') {
                 paulaoSprite.className = 'paulao-door-l';
                 paulaoSprite.style.filter = 'brightness(1)'; 
-                playSound('windowscare'); // Susto leve
+                playSound('windowscare'); 
             } else if (side === 'right' && state.paulaoLocation === 'DoorR') {
                 paulaoSprite.className = 'paulao-door-r';
                 paulaoSprite.style.filter = 'brightness(1)';
@@ -325,7 +418,7 @@
                 paulaoSprite.className = ''; 
             }
         } else {
-            loops.light.pause(); // PARA SOM DA LUZ
+            loops.light.pause(); 
             voidArea.style.opacity = '0.6'; 
             paulaoSprite.className = ''; 
             paulaoSprite.style.filter = 'brightness(0.2)';
@@ -339,13 +432,11 @@
         isTransitioning = true;
         const transImg = document.getElementById('monitor-transition');
         const cctv = document.getElementById('cctv-layer');
-        const btn = document.getElementById('monitor-btn');
 
         let isOpening = !state.cameraActive;
         let frame = isOpening ? 1 : 11;
         const step = isOpening ? 1 : -1;
         
-        // SOM DO MONITOR
         if(isOpening) playSound('monitor_open');
         else playSound('monitor_close');
 
@@ -354,7 +445,7 @@
 
         if (!isOpening) {
             cctv.style.display = 'none';
-            btn.classList.remove('monitor-open');
+            stopWhiteBars();
         }
 
         const animInterval = setInterval(() => {
@@ -370,18 +461,38 @@
                 
                 if (state.cameraActive) {
                     cctv.style.display = 'block';
-                    btn.classList.add('monitor-open');
                     switchCam(state.currentCam);
+                    startWhiteBars();
                 } 
                 updateUsage();
             }
         }, 25);
     }
 
+    function startWhiteBars() {
+        const whiteBarsImg = document.getElementById('white-bars-anim');
+        whiteBarsImg.style.display = 'block';
+        let barFrame = 1;
+        if(whiteBarsInterval) clearInterval(whiteBarsInterval);
+        whiteBarsInterval = setInterval(() => {
+            whiteBarsImg.src = `WHITE_BARS/${barFrame}.png`;
+            barFrame++;
+            if(barFrame > 7) barFrame = 1;
+        }, 50); 
+    }
+
+    function stopWhiteBars() {
+        if(whiteBarsInterval) {
+            clearInterval(whiteBarsInterval);
+            whiteBarsInterval = null;
+        }
+        document.getElementById('white-bars-anim').style.display = 'none';
+    }
+
     function switchCam(camID) {
         state.currentCam = camID;
         document.getElementById('cam-name').innerText = "CAM " + camID;
-        playSound('blip'); // SOM DE TROCA DE CAMERA
+        playSound('blip'); 
 
         const feed = document.getElementById('cctv-feed');
         let bgImage = camImages[camID] ? camImages[camID] : 'cam1.jpg';
@@ -409,12 +520,12 @@
         if(state.doorR) usage++;
         if(state.cameraActive) usage++;
         
-        let bars = "";
-        for(let i=0; i<usage; i++) {
-            let color = i > 3 ? 'red' : '#0f0'; 
-            bars += `<div class='battery-bar' style='background:${color}'></div>`;
-        }
-        document.getElementById('usage-bars').innerHTML = bars;
+        if(usage > 5) usage = 5;
+        if(usage < 1) usage = 1;
+
+        const usageImg = document.getElementById('usage-img');
+        if(usageImg) usageImg.src = `USAGE_BAR/${usage}.png`;
+
         return usage;
     }
 
@@ -425,24 +536,20 @@
         if(currentIndex === -1) currentIndex = 0;
         let nextLoc = path[currentIndex + 1];
 
-        // Se mover, toca som de passos
         playSound('step');
 
         if (nextLoc === 'Office') {
-            // SOM DE CORRIDA (FOXY)
             playSound('run');
-            
-            // Espera um pouco pra simular o tempo de correr o corredor
             setTimeout(() => {
                 if(state.doorL) {
                     console.log("Paulão bateu na porta!");
-                    playSound('bang'); // SOM DE BATIDA
+                    playSound('bang'); 
                     state.paulaoLocation = '1A'; 
                 } else {
                     state.paulaoLocation = 'Office';
                     triggerJumpscare();
                 }
-            }, 2000); // 2 segundos correndo
+            }, 2000); 
         } else {
             state.paulaoLocation = nextLoc;
         }
@@ -452,18 +559,16 @@
     function blackout() {
         state.doorL = false; state.doorR = false;
         state.cameraActive = false;
-        
-        // Para sons do ambiente
         loops.fan.pause();
         loops.ambience.pause();
-        playSound('powerdown'); // SOM DE DESLIGAR
+        playSound('powerdown'); 
+        stopWhiteBars();
 
         document.getElementById('cctv-layer').style.display = 'none';
         document.getElementById('office-layer').style.backgroundImage = 'none';
         document.getElementById('office-layer').style.backgroundColor = '#000'; 
         document.getElementById('hud').style.display = 'none';
         
-        // Toca música do Freddy (Darkness) após breve delay
         setTimeout(() => {
             playSound('darkness');
         }, 1000);
@@ -479,10 +584,11 @@
         clearInterval(aiTimer);
         loops.fan.pause();
         loops.ambience.pause();
+        stopWhiteBars();
 
         document.getElementById('cctv-layer').style.display = 'none';
         
-        playSound('scream'); // GRITO
+        playSound('scream'); 
 
         const attackImg = document.getElementById('paulao-attack');
         attackImg.style.display = 'block';
@@ -491,7 +597,7 @@
             attackImg.style.display = 'none';
             document.getElementById('static-screen').style.display = 'block';
             document.getElementById('game-over-txt').style.display = 'block';
-            playSound('menu_static'); // Volta estática
+            playSound('menu_static'); 
         }, 3000);
         
         setTimeout(() => {
