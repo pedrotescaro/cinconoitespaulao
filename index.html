@@ -2,382 +2,102 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Five Nights at Paulão - Final Definitive Edition</title>
+<title>Five Nights at Paulão - Audio Update</title>
 <style>
     /* --- CSS GERAL --- */
-    body {
-        margin: 0;
-        background: #000;
-        overflow: hidden;
-        font-family: 'Courier New', Courier, monospace;
-        user-select: none;
-        color: white;
-    }
+    body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', Courier, monospace; user-select: none; color: white; }
 
-    /* --- MENU PRINCIPAL --- */
-    #main-menu {
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background: black;
-        z-index: 1000;
-        overflow: hidden;
-    }
-
-    /* FUNDO DE ESTÁTICA */
-    #static-bg {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background-size: cover;
-        background-position: center;
-        opacity: 0.4;
-        z-index: 1000;
-        animation: static-loop 0.3s steps(1) infinite;
-    }
-
+    /* --- MENU --- */
+    #main-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; z-index: 1000; overflow: hidden; }
+    #static-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0.4; z-index: 1000; animation: static-loop 0.3s steps(1) infinite; }
     @keyframes static-loop {
-        0%   { background-image: url('staticpngs/1.png'); }
-        12.5% { background-image: url('staticpngs/2.png'); }
-        25%  { background-image: url('staticpngs/3.png'); }
-        37.5% { background-image: url('staticpngs/4.png'); }
-        50%  { background-image: url('staticpngs/5.png'); }
-        62.5% { background-image: url('staticpngs/6.png'); }
-        75%  { background-image: url('staticpngs/7.png'); }
-        87.5% { background-image: url('staticpngs/8.png'); }
-        100% { background-image: url('staticpngs/1.png'); }
+        0% { background-image: url('staticpngs/1.png'); } 12.5% { background-image: url('staticpngs/2.png'); } 25% { background-image: url('staticpngs/3.png'); } 37.5% { background-image: url('staticpngs/4.png'); } 50% { background-image: url('staticpngs/5.png'); } 62.5% { background-image: url('staticpngs/6.png'); } 75% { background-image: url('staticpngs/7.png'); } 87.5% { background-image: url('staticpngs/8.png'); } 100% { background-image: url('staticpngs/1.png'); }
     }
-
-    /* O Paulão no Menu */
-    #menu-paulao {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        height: 100vh;
-        width: auto;
-        max-width: 60vw;
-        object-fit: cover;
-        z-index: 1001;
-        filter: brightness(0.5) contrast(1.3) sepia(0.3);
-        pointer-events: none;
-    }
-
-    /* Texto do Menu */
-    #menu-content {
-        position: absolute;
-        top: 15%;
-        left: 10%;
-        z-index: 1002;
-        display: flex;
-        flex-direction: column;
-    }
-
-    #game-title {
-        font-size: 4rem;
-        font-weight: bold;
-        text-shadow: 4px 4px 0px #500;
-        margin-bottom: 40px;
-        border-left: 5px solid #500;
-        padding-left: 20px;
-        animation: glitch-text 0.3s infinite; 
-    }
-
-    .menu-option {
-        font-size: 1.8rem;
-        margin: 10px 0;
-        cursor: pointer;
-        width: fit-content;
-        transition: 0.1s;
-        font-weight: bold;
-        color: #ccc;
-    }
-    .menu-option:hover {
-        color: #fff;
-        text-shadow: 0 0 10px #fff;
-    }
-    .menu-option::before {
-        content: ">> ";
-        opacity: 0;
-    }
-    .menu-option:hover::before {
-        opacity: 1;
-    }
-
-    .scanlines-menu {
-        position: absolute; top:0; left:0; width:100%; height:100%;
-        background: repeating-linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 1px, transparent 2px, transparent 4px);
-        pointer-events: none;
-        z-index: 2001;
-    }
+    #menu-paulao { position: absolute; right: 0; bottom: 0; height: 100vh; width: auto; max-width: 60vw; object-fit: cover; z-index: 1001; filter: brightness(0.5) contrast(1.3) sepia(0.3); pointer-events: none; }
+    #menu-content { position: absolute; top: 15%; left: 10%; z-index: 1002; display: flex; flex-direction: column; }
+    #game-title { font-size: 4rem; font-weight: bold; text-shadow: 4px 4px 0px #500; margin-bottom: 40px; border-left: 5px solid #500; padding-left: 20px; animation: glitch-text 0.3s infinite; }
+    .menu-option { font-size: 1.8rem; margin: 10px 0; cursor: pointer; width: fit-content; transition: 0.1s; font-weight: bold; color: #ccc; }
+    .menu-option:hover { color: #fff; text-shadow: 0 0 10px #fff; }
+    .menu-option::before { content: ">> "; opacity: 0; }
+    .menu-option:hover::before { opacity: 1; }
+    .scanlines-menu { position: absolute; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 1px, transparent 2px, transparent 4px); pointer-events: none; z-index: 2001; }
 
     /* --- JOGO --- */
-    #game-view {
-        display: none; 
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
-    }
-
-    #office-layer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 130%; 
-        height: 100%;
-        background-image: url('office_bg.png');
-        background-size: cover;
-        background-position: center;
-        transition: transform 0.1s linear;
-    }
-
-    .door-panel {
-        position: absolute;
-        top: 40%;
-        width: 60px;
-        height: 150px;
-        background: #333;
-        border: 2px solid #555;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 10;
-        box-shadow: inset 0 0 10px #000;
-    }
+    #game-view { display: none; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+    #office-layer { position: absolute; top: 0; left: 0; width: 130%; height: 100%; background-image: url('office_bg.png'); background-size: cover; background-position: center; transition: transform 0.1s linear; }
+    
+    .door-panel { position: absolute; top: 40%; width: 60px; height: 150px; background: #333; border: 2px solid #555; display: flex; flex-direction: column; justify-content: space-around; align-items: center; z-index: 10; box-shadow: inset 0 0 10px #000; }
     .panel-left { left: 0; border-right: none; border-radius: 0 10px 10px 0; }
     .panel-right { right: 0; border-left: none; border-radius: 10px 0 0 10px; }
-
-    .btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        cursor: pointer;
-        border: 3px solid #222;
-        font-size: 10px;
-        display: flex; align-items: center; justify-content: center; font-weight: bold;
-        transition: 0.1s;
-    }
+    
+    .btn { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid #222; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.1s; }
     .btn-door { background: #500; color: white; }
     .btn-light { background: #ccc; color: black; }
-    
     .btn-door.active { background: #0f0; box-shadow: 0 0 15px #0f0; }
     .btn-light.active { background: #ff0; box-shadow: 0 0 15px #ff0; }
 
-    .heavy-door {
-        position: absolute;
-        top: 0;
-        width: 18%; 
-        height: 100%;
-        background: repeating-linear-gradient(90deg, #111, #222 10px, #111 20px);
-        border-right: 5px solid #000;
-        transition: transform 0.2s ease-in;
-        z-index: 5;
-    }
+    .heavy-door { position: absolute; top: 0; width: 18%; height: 100%; background: repeating-linear-gradient(90deg, #111, #222 10px, #111 20px); border-right: 5px solid #000; transition: transform 0.2s ease-in; z-index: 5; }
     #door-l { left: 0; transform: translateY(-100%); border-right: 5px solid #000; }
     #door-r { right: 0; transform: translateY(-100%); border-left: 5px solid #000; }
     .closed { transform: translateY(0) !important; }
 
-    .door-void {
-        position: absolute;
-        top: 0;
-        width: 20%;
-        height: 100%;
-        background: black;
-        opacity: 0.6; 
-        z-index: 4;
-        transition: opacity 0.1s;
-    }
-    #void-l { left: 0; }
-    #void-r { right: 0; }
+    .door-void { position: absolute; top: 0; width: 20%; height: 100%; background: black; opacity: 0.6; z-index: 4; transition: opacity 0.1s; }
+    #void-l { left: 0; } #void-r { right: 0; }
 
-    #monitor-btn {
-        position: absolute;
-        bottom: 20px;
-        right: 30%;
-        width: 40%;
-        height: 30px;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid white;
-        color: white;
-        text-align: center;
-        line-height: 30px;
-        cursor: pointer;
-        z-index: 100; 
-        font-weight: bold;
-        transition: background 0.3s;
-    }
+    /* MONITOR */
+    #monitor-btn { position: absolute; bottom: 20px; right: 30%; width: 40%; height: 30px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; text-align: center; line-height: 30px; cursor: pointer; z-index: 100; font-weight: bold; transition: background 0.3s; }
     #monitor-btn:hover { background: rgba(255,255,255,0.3); }
     #monitor-btn.monitor-open { background: rgba(255,255,255,0.5); border-color: #0f0; color: #0f0; }
 
-    #cctv-layer {
-        display: none;
-        position: absolute;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background: #000;
-        z-index: 50; 
-        border: 5px solid #333;
-    }
-    
-    #cctv-feed {
-        width: 100%; height: 100%;
-        background-color: #111;
-        background-size: cover; 
-        background-position: center;
-        position: relative;
-    }
-    
-    #paulao-cam-overlay {
-        display: none;
-        position: absolute;
-        top: 20%; left: 30%;
-        height: 60%;
-        filter: grayscale(0.8) contrast(1.2);
-    }
+    #cctv-layer { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 50; border: 5px solid #333; }
+    #cctv-feed { width: 100%; height: 100%; background-color: #111; background-size: cover; background-position: center; position: relative; }
+    #paulao-cam-overlay { display: none; position: absolute; top: 20%; left: 30%; height: 60%; filter: grayscale(0.8) contrast(1.2); }
+    .scanlines { position: absolute; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 1px, transparent 2px, transparent 4px); pointer-events: none; z-index: 55; }
 
-    .scanlines {
-        position: absolute; top:0; left:0; width:100%; height:100%;
-        background: repeating-linear-gradient(0deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 1px, transparent 2px, transparent 4px);
-        pointer-events: none;
-        z-index: 55;
-    }
-
-    #map-ui {
-        position: absolute;
-        bottom: 60px; right: 50px;
-        width: 250px; height: 180px;
-        background-image: url('map.png'); 
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        z-index: 60;
-    }
-    
-    .cam-btn {
-        width: 45px; height: 25px;
-        background: #222; color: #fff;
-        border: 1px solid #555;
-        position: absolute;
-        cursor: pointer;
-        font-size: 10px;
-        opacity: 0.7;
-    }
+    #map-ui { position: absolute; bottom: 60px; right: 50px; width: 250px; height: 180px; background-image: url('map.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 60; }
+    .cam-btn { width: 45px; height: 25px; background: #222; color: #fff; border: 1px solid #555; position: absolute; cursor: pointer; font-size: 10px; opacity: 0.7; }
     .cam-btn:hover { opacity: 1; }
     .cam-btn.active { background: #0f0; color: black; animation: blink-btn 1s infinite; }
-
-    #btn-1a { top: 10px; left: 90px; } 
-    #btn-1b { top: 50px; left: 50px; } 
-    #btn-2a { top: 90px; left: 90px; } 
-    #btn-3  { top: 50px; right: 40px; } 
-    #btn-4  { bottom: 20px; right: 80px; } 
-
-    #paulao-sprite {
-        position: absolute;
-        display: none;
-        width: 300px; 
-        bottom: 0;
-        z-index: 4;
-        filter: brightness(0.2);
-        transition: filter 0.1s;
-    }
-    .paulao-door-l { left: 12%; display: block !important; }
-    .paulao-door-r { right: 12%; display: block !important; }
-
-    /* TRANSIÇÃO DO MONITOR */
-    #monitor-transition {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        z-index: 200; 
-        object-fit: cover;
-        pointer-events: none;
-    }
-
-    /* JUMPSCARE */
-    #paulao-attack {
-        display: none;
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        height: auto; 
-        max-width: 80vw; 
-        max-height: 100vh;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        z-index: 200;
-        animation: foxy-shake 0.15s infinite;
-        filter: contrast(1.5) brightness(0.8);
-        pointer-events: none;
-    }
-
-    @keyframes foxy-shake {
-        0% { transform: translateX(0) scale(1); }
-        25% { transform: translateX(10px) scale(1.02); }
-        50% { transform: translateX(0px) scale(1.05); }
-        75% { transform: translateX(15px) scale(1.02); }
-        100% { transform: translateX(0) scale(1); }
-    }
     
-    @keyframes glitch-text {
-        0% { opacity: 1; transform: skewX(0deg); }
-        90% { opacity: 1; transform: skewX(0deg); }
-        92% { opacity: 0.8; transform: skewX(20deg); }
-        94% { opacity: 1; transform: skewX(0deg); }
-        96% { opacity: 0.8; transform: skewX(-20deg); }
-        100% { opacity: 1; }
-    }
+    #btn-1a { top: 10px; left: 90px; } #btn-1b { top: 50px; left: 50px; } #btn-2a { top: 90px; left: 90px; } #btn-3 { top: 50px; right: 40px; } #btn-4 { bottom: 20px; right: 80px; }
 
-    #static-screen {
-        display: none;
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); 
-        background-size: cover;
-        z-index: 300;
-        opacity: 0.8;
-    }
-    #game-over-txt {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        color: red; font-size: 3rem; font-weight: bold; display: none; z-index: 301;
-    }
+    #paulao-sprite { position: absolute; display: none; width: 300px; bottom: 0; z-index: 4; filter: brightness(0.2); transition: filter 0.1s; }
+    .paulao-door-l { left: 12%; display: block !important; } .paulao-door-r { right: 12%; display: block !important; }
 
-    #hud {
-        position: absolute;
-        bottom: 20px; left: 20px;
-        color: white; font-size: 1.2rem;
-        z-index: 20;
-        text-shadow: 1px 1px 0 #000;
-    }
-    .battery-bar {
-        display: inline-block;
-        width: 15px; height: 25px;
-        background: #0f0; margin-right: 3px; border: 1px solid #fff;
-    }
+    #monitor-transition { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 200; object-fit: cover; pointer-events: none; }
+
+    /* JUMPSCARE & GAME OVER */
+    #paulao-attack { display: none; position: absolute; left: 0; bottom: 0; height: auto; max-width: 80vw; max-height: 100vh; background: transparent !important; border: none !important; box-shadow: none !important; z-index: 200; animation: foxy-shake 0.15s infinite; filter: contrast(1.5) brightness(0.8); pointer-events: none; }
+    @keyframes foxy-shake { 0% { transform: translateX(0) scale(1); } 25% { transform: translateX(10px) scale(1.02); } 50% { transform: translateX(0px) scale(1.05); } 75% { transform: translateX(15px) scale(1.02); } 100% { transform: translateX(0) scale(1); } }
+    @keyframes glitch-text { 0% { opacity: 1; transform: skewX(0deg); } 92% { opacity: 0.8; transform: skewX(20deg); } 96% { opacity: 0.8; transform: skewX(-20deg); } 100% { opacity: 1; } }
+    @keyframes blink { 0% {opacity:1} 50% {opacity:0} 100% {opacity:1} }
+    @keyframes blink-btn { 0% {background:#0f0} 50% {background:#050} 100% {background:#0f0} }
+
+    #static-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); background-size: cover; z-index: 300; opacity: 0.8; }
+    #game-over-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; font-size: 3rem; font-weight: bold; display: none; z-index: 301; }
+
+    #hud { position: absolute; bottom: 20px; left: 20px; color: white; font-size: 1.2rem; z-index: 20; text-shadow: 1px 1px 0 #000; }
+    .battery-bar { display: inline-block; width: 15px; height: 25px; background: #0f0; margin-right: 3px; border: 1px solid #fff; }
 </style>
 </head>
 <body>
 
-<audio id="sfx-scare" src="scare.mp3"></audio> 
-<audio id="sfx-ambience" src="ambience.mp3" loop></audio>
-
 <div id="main-menu">
     <div id="static-bg"></div>
     <div class="scanlines-menu"></div>
-    
     <div id="menu-content">
         <div id="game-title">Five Nights<br>at Paulão</div>
         <div class="menu-option" onclick="startGame()">New Game</div>
-        <div class="menu-option">Continue</div>
-        <div class="menu-option">6th Night</div>
-        <div class="menu-option">Custom Night</div>
+        <div class="menu-option" onclick="playSound('blip')">Continue</div>
+        <div class="menu-option" onclick="playSound('blip')">6th Night</div>
+        <div class="menu-option" onclick="playSound('blip')">Custom Night</div>
         <div style="margin-top: 30px; font-size: 0.8rem; color: #555;">(C) 2025 Predo Games</div>
     </div>
-
     <img id="menu-paulao" src="paulo_menu1.png">
 </div>
 
 <img id="monitor-transition" src="">
-
-<img id="paulao-attack" src="paulao_susto.png">
-
+<img id="paulao-attack" src="paulo_menu2.png">
 <div id="static-screen"></div>
 <div id="game-over-txt">GAME OVER</div>
 
@@ -428,6 +148,49 @@
 </div>
 
 <script>
+    /* --- CONFIGURAÇÃO DE ÁUDIO --- */
+    const audioFiles = {
+        menu_static: 'audio/static2.wav',
+        blip: 'audio/blip3.wav',
+        fan: 'audio/Buzz_Fan_Florescent2.wav',
+        ambience: 'audio/ambience2.wav',
+        door: 'audio/OVEN-DRA_1_GEN-HDF18119.wav',
+        light_hum: 'audio/BallastHumMedium2.wav',
+        monitor_open: 'audio/CAMERA_VIDEO_LOA_60105303.wav',
+        monitor_close: 'audio/put down.wav',
+        run: 'audio/running fast3.wav',
+        bang: 'audio/DOOR_POUNDING_ME_D0291401.wav',
+        step: 'audio/deep steps.wav',
+        powerdown: 'audio/powerdown.wav',
+        darkness: 'audio/darkness music.wav',
+        scream: 'audio/XSCREAM.wav',
+        win: 'audio/chimes 2.wav'
+    };
+
+    // Objetos de áudio persistentes (loops)
+    const loops = {
+        menu: new Audio(audioFiles.menu_static),
+        fan: new Audio(audioFiles.fan),
+        ambience: new Audio(audioFiles.ambience),
+        light: new Audio(audioFiles.light_hum)
+    };
+
+    // Configuração dos loops
+    loops.menu.loop = true;
+    loops.fan.loop = true;
+    loops.ambience.loop = true;
+    loops.light.loop = true;
+    loops.menu.volume = 0.3; // Estática do menu mais baixa
+
+    // Função Helper para tocar sons pontuais (SFX)
+    function playSound(key) {
+        if(audioFiles[key]) {
+            const sfx = new Audio(audioFiles[key]);
+            sfx.volume = 0.8;
+            sfx.play().catch(e => {}); // Ignora erros de autoplay
+        }
+    }
+
     /* --- LÓGICA DO JOGO --- */
 
     const state = {
@@ -453,11 +216,18 @@
     let menuGlitchTimer = null; 
     let isTransitioning = false; 
 
+    // Inicia som do menu ao interagir com a página (necessário em alguns navegadores)
+    document.addEventListener('click', () => {
+        if(document.getElementById('main-menu').style.display !== 'none') {
+            loops.menu.play().catch(()=>{});
+        }
+    }, {once:true});
+
+    // Efeito Panorama
     const officeLayer = document.getElementById('office-layer');
     document.addEventListener('mousemove', (e) => {
         if(document.getElementById('game-view').style.display !== 'block') return;
         if(state.cameraActive || state.gameOver) return;
-
         let width = window.innerWidth;
         let mouseX = e.clientX;
         let percent = mouseX / width;
@@ -465,30 +235,33 @@
         officeLayer.style.transform = `translateX(-${moveX}%)`;
     });
 
+    // Menu Glitch
     function menuGlitchLoop() {
         if(document.getElementById('game-view').style.display === 'block') return; 
-
-        let timeToNext = Math.random() * 3000 + 1000;
-
+        let timeToNext = Math.random() * 30000 + 1000;
         menuGlitchTimer = setTimeout(() => {
             const img = document.getElementById('menu-paulao');
             img.src = 'paulo_menu2.png'; 
-            
             setTimeout(() => {
                 img.src = 'paulo_menu1.png'; 
                 menuGlitchLoop();
             }, Math.random() * 170 + 50);
-
         }, timeToNext);
     }
-
     menuGlitchLoop();
 
+    // START GAME
     function startGame() {
+        playSound('blip');
+        loops.menu.pause(); // Para som do menu
         document.getElementById('main-menu').style.display = 'none';
         clearTimeout(menuGlitchTimer);
         document.getElementById('game-view').style.display = 'block';
-        document.getElementById('sfx-ambience').play().catch(e => console.log("Ambience error"));
+        
+        // Inicia Ambiente
+        loops.fan.play();
+        loops.ambience.play();
+
         startLoops();
     }
 
@@ -511,7 +284,13 @@
     }
 
     function toggleDoor(side, btn) {
-        if(state.power <= 0 || state.gameOver) return;
+        if(state.power <= 0 || state.gameOver) {
+            playSound('blip'); // Som de erro se sem energia
+            return;
+        }
+        
+        playSound('door'); // SOM DA PORTA
+
         let door = document.getElementById(side === 'left' ? 'door-l' : 'door-r');
         if(side === 'left') {
             state.doorL = !state.doorL;
@@ -526,21 +305,27 @@
 
     function light(side, on) {
         if(state.power <= 0 || state.gameOver) return;
+        
         const voidArea = document.getElementById(side === 'left' ? 'void-l' : 'void-r');
         const paulaoSprite = document.getElementById('paulao-sprite');
         
         if (on) {
+            loops.light.currentTime = 0;
+            loops.light.play(); // TOCA SOM DA LUZ
             voidArea.style.opacity = '0'; 
             if (side === 'left' && state.paulaoLocation === 'DoorL') {
                 paulaoSprite.className = 'paulao-door-l';
                 paulaoSprite.style.filter = 'brightness(1)'; 
+                playSound('windowscare'); // Susto leve
             } else if (side === 'right' && state.paulaoLocation === 'DoorR') {
                 paulaoSprite.className = 'paulao-door-r';
                 paulaoSprite.style.filter = 'brightness(1)';
+                playSound('windowscare');
             } else {
                 paulaoSprite.className = ''; 
             }
         } else {
+            loops.light.pause(); // PARA SOM DA LUZ
             voidArea.style.opacity = '0.6'; 
             paulaoSprite.className = ''; 
             paulaoSprite.style.filter = 'brightness(0.2)';
@@ -548,7 +333,6 @@
         updateUsage();
     }
 
-    // --- FUNÇÃO DO MONITOR ATUALIZADA (BIDIRECIONAL) ---
     function toggleMonitor() {
         if(state.power <= 0 || state.gameOver || isTransitioning) return;
 
@@ -557,52 +341,48 @@
         const cctv = document.getElementById('cctv-layer');
         const btn = document.getElementById('monitor-btn');
 
-        // Configuração da direção da animação
-        let isOpening = !state.cameraActive; // Se não está ativa, vamos abrir
-        let frame = isOpening ? 1 : 11; // Começa no 1 se abrir, 11 se fechar
-        const step = isOpening ? 1 : -1; // Incrementa ou decrementa
-        const endFrame = isOpening ? 11 : 1; // Onde para
+        let isOpening = !state.cameraActive;
+        let frame = isOpening ? 1 : 11;
+        const step = isOpening ? 1 : -1;
+        
+        // SOM DO MONITOR
+        if(isOpening) playSound('monitor_open');
+        else playSound('monitor_close');
 
-        // Mostra a camada de transição e seta o primeiro frame
         transImg.style.display = 'block';
         transImg.src = `camera_transition/${frame}.png`;
 
-        // Se estiver fechando, esconde o CCTV imediatamente para vermos a animação sobre o escritório
         if (!isOpening) {
             cctv.style.display = 'none';
             btn.classList.remove('monitor-open');
         }
 
-        const frameRate = 25; // Velocidade da animação (ms)
-
         const animInterval = setInterval(() => {
             frame += step;
             transImg.src = `camera_transition/${frame}.png`;
 
-            // Verifica se chegou ao fim (se abrindo > 11, se fechando < 1)
             if ((isOpening && frame > 11) || (!isOpening && frame < 1)) {
                 clearInterval(animInterval);
                 isTransitioning = false;
                 transImg.style.display = 'none';
                 
-                // Inverte o estado real
                 state.cameraActive = !state.cameraActive;
                 
-                // Se acabou de abrir, mostra a tela da câmera
                 if (state.cameraActive) {
                     cctv.style.display = 'block';
                     btn.classList.add('monitor-open');
                     switchCam(state.currentCam);
                 } 
-                
                 updateUsage();
             }
-        }, frameRate);
+        }, 25);
     }
 
     function switchCam(camID) {
         state.currentCam = camID;
         document.getElementById('cam-name').innerText = "CAM " + camID;
+        playSound('blip'); // SOM DE TROCA DE CAMERA
+
         const feed = document.getElementById('cctv-feed');
         let bgImage = camImages[camID] ? camImages[camID] : 'cam1.jpg';
         feed.style.backgroundImage = `url('${bgImage}')`;
@@ -645,14 +425,24 @@
         if(currentIndex === -1) currentIndex = 0;
         let nextLoc = path[currentIndex + 1];
 
+        // Se mover, toca som de passos
+        playSound('step');
+
         if (nextLoc === 'Office') {
-            if(state.doorL) {
-                console.log("Paulão bateu na porta!");
-                state.paulaoLocation = '1A'; 
-            } else {
-                state.paulaoLocation = 'Office';
-                triggerJumpscare();
-            }
+            // SOM DE CORRIDA (FOXY)
+            playSound('run');
+            
+            // Espera um pouco pra simular o tempo de correr o corredor
+            setTimeout(() => {
+                if(state.doorL) {
+                    console.log("Paulão bateu na porta!");
+                    playSound('bang'); // SOM DE BATIDA
+                    state.paulaoLocation = '1A'; 
+                } else {
+                    state.paulaoLocation = 'Office';
+                    triggerJumpscare();
+                }
+            }, 2000); // 2 segundos correndo
         } else {
             state.paulaoLocation = nextLoc;
         }
@@ -662,11 +452,23 @@
     function blackout() {
         state.doorL = false; state.doorR = false;
         state.cameraActive = false;
+        
+        // Para sons do ambiente
+        loops.fan.pause();
+        loops.ambience.pause();
+        playSound('powerdown'); // SOM DE DESLIGAR
+
         document.getElementById('cctv-layer').style.display = 'none';
         document.getElementById('office-layer').style.backgroundImage = 'none';
         document.getElementById('office-layer').style.backgroundColor = '#000'; 
         document.getElementById('hud').style.display = 'none';
-        setTimeout(triggerJumpscare, 5000);
+        
+        // Toca música do Freddy (Darkness) após breve delay
+        setTimeout(() => {
+            playSound('darkness');
+        }, 1000);
+
+        setTimeout(triggerJumpscare, 8000);
     }
 
     function triggerJumpscare() {
@@ -675,9 +477,12 @@
         
         clearInterval(powerTimer);
         clearInterval(aiTimer);
+        loops.fan.pause();
+        loops.ambience.pause();
 
         document.getElementById('cctv-layer').style.display = 'none';
-        document.getElementById('sfx-scare').play().catch(e => console.log("Audio needs interaction"));
+        
+        playSound('scream'); // GRITO
 
         const attackImg = document.getElementById('paulao-attack');
         attackImg.style.display = 'block';
@@ -686,6 +491,7 @@
             attackImg.style.display = 'none';
             document.getElementById('static-screen').style.display = 'block';
             document.getElementById('game-over-txt').style.display = 'block';
+            playSound('menu_static'); // Volta estática
         }, 3000);
         
         setTimeout(() => {
